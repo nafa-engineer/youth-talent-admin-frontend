@@ -11,5 +11,12 @@ export const weeksApi = {
   getWeekById: async (id: number | string): Promise<WeekDto> => {
     const response = await apiClient.get<WeekDto>(API_ROUTES.WEEK_DETAIL(id));
     return response.data;
+  },
+
+  getWeeksByDateRange: async (startDate: string, endDate: string): Promise<WeekDto[]> => {
+    const response = await apiClient.get<WeekDto[]>(API_ROUTES.WEEKS, {
+      params: { startDate, endDate }
+    });
+    return response.data;
   }
 };

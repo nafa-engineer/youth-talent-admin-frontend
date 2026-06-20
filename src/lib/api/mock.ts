@@ -334,6 +334,12 @@ export const setupMockApi = () => {
     return [200, { status: 200, message: "Success", data: week }];
   });
 
+  mock.onGet(API_ROUTES.WEEKS).reply(200, {
+    status: 200,
+    message: "Success",
+    data: mockWeeks
+  });
+
   // 5. Mock Deed Activities
   mock.onGet(API_ROUTES.DEED_ACTIVITIES).reply(200, {
     status: 200,
@@ -668,37 +674,7 @@ export const setupMockApi = () => {
     }];
   });
 
-  mock.onPut(/\/api\/v1\/admins\/\d+$/).reply((config) => {
-    const urlParts = config.url?.split('/');
-    const id = parseInt(urlParts?.[urlParts.length - 1] || '0', 10);
-    const { name, email, adminGroupId, campusId } = JSON.parse(config.data);
-    
-    const adminIndex = mockAdmins.findIndex(a => a.id === id);
-    if (adminIndex === -1) {
-      return [404, { status: 404, message: "Admin tidak ditemukan" }];
-    }
 
-    const campus = campusId ? campuses.find(c => c.id === Number(campusId)) : null;
-    const isSuper = adminGroupId === 1;
-    const adminGroupCode = isSuper ? "SUPER_ADMIN" : "ADMIN";
-    const adminGroupName = isSuper ? "Super Admin" : "Admin Kampus";
-
-    mockAdmins[adminIndex] = {
-      ...mockAdmins[adminIndex],
-      name,
-      email,
-      adminGroupCode,
-      adminGroupName,
-      campusId: isSuper ? null : (campus ? campus.id : null),
-      campusName: isSuper ? null : (campus ? campus.name : null),
-    };
-
-    return [200, {
-      status: 200,
-      message: "Admin berhasil diperbarui",
-      data: mockAdmins[adminIndex]
-    }];
-  });
 
   mock.onPut(/\/api\/v1\/admins\/\d+\/deactivate$/).reply((config) => {
     const urlParts = config.url?.split('/');

@@ -20,18 +20,18 @@ interface CampusFilterProps {
 }
 
 export function CampusFilter({ value, onChange, className }: CampusFilterProps) {
-  const { isSuperAdmin, getCampusId, user } = useAuth();
+  const { isSuperAdmin, user } = useAuth();
+  const campusId = user?.campusId || null;
   const [campuses, setCampuses] = useState<CampusDto[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // If Admin, they are locked to their own campus, no need to fetch all campuses
     if (!isSuperAdmin) {
-      const myCampusId = getCampusId();
-      if (myCampusId) {
+      if (campusId) {
         // Automatically set the value to their campus if not already
-        if (value !== myCampusId) {
-          onChange(myCampusId);
+        if (value !== campusId) {
+          onChange(campusId);
         }
       }
       return;
@@ -52,12 +52,12 @@ export function CampusFilter({ value, onChange, className }: CampusFilterProps) 
     };
 
     fetchCampuses();
-  }, [isSuperAdmin, getCampusId, value, onChange]);
+  }, [isSuperAdmin, campusId, value, onChange]);
 
   // For Admin, just show a disabled select with their campus name
   if (!isSuperAdmin) {
     return (
-      <Select disabled value={String(getCampusId())}>
+      <Select disabled value={String(campusId)}>
         <SelectTrigger className={className}>
           <SelectValue placeholder={user?.campusName || 'Kampus Anda'} />
         </SelectTrigger>

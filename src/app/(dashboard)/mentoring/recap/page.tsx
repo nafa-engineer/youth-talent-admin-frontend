@@ -48,15 +48,18 @@ export default function MentoringRecapPage() {
         const curWeek = await weeksApi.getCurrentWeek()
         setCurrentWeek(curWeek)
         
-        // Fetch all weeks (represented by mock list, or hardcoded for select list)
-        // Since mock api returns current week, let's also define standard weeks
-        // In real backend we would query all weeks or current week detail.
-        // We'll mock weeks 1, 2, 3 in setup.
-        setWeeks([
-          { id: 1, year: 2026, weekNumber: 23, startDate: '2026-06-08', endDate: '2026-06-14' },
-          { id: 2, year: 2026, weekNumber: 24, startDate: '2026-06-15', endDate: '2026-06-21' },
-          { id: 3, year: 2026, weekNumber: 25, startDate: '2026-06-22', endDate: '2026-06-28' },
-        ])
+        // Fetch weeks from API based on date range (last 2 months)
+        const today = new Date()
+        const twoMonthsAgo = new Date()
+        twoMonthsAgo.setMonth(today.getMonth() - 2)
+
+        const startDateStr = twoMonthsAgo.toISOString().split('T')[0]
+        const endDateStr = today.toISOString().split('T')[0]
+
+        const weeksList = await weeksApi.getWeeksByDateRange(startDateStr, endDateStr)
+        // Sort weeks descending so latest week is shown first in dropdown
+        weeksList.sort((a, b) => b.weekNumber - a.weekNumber)
+        setWeeks(weeksList)
         
         // Fetch teams based on campus
         const campusIdToFetch = !isSuperAdmin ? myCampusId : selectedCampus
@@ -76,17 +79,28 @@ export default function MentoringRecapPage() {
   // Fetch mentoring recap data on filter change
   useEffect(() => {
     const fetchRecap = async () => {
+      if (weeks.length === 0) return
       setIsLoadingRecaps(true)
       try {
         const campusId = !isSuperAdmin ? myCampusId : selectedCampus
         
-        const params: MentoringRecapParams = {}
+        const params: Partial<MentoringRecapParams> = {}
         if (campusId) params.campusId = campusId
         if (selectedGender !== "ALL") params.gender = selectedGender as "PRIA" | "WANITA"
         if (selectedTeam !== "ALL") params.teamId = Number(selectedTeam)
-        if (selectedWeek !== "ALL") params.weekId = Number(selectedWeek)
 
-        const data = await mentoringApi.getMentoringRecap(params)
+        // Mapping parameters based on selectedWeek (hybrid approach)
+        if (selectedWeek !== "ALL") {
+          // Pekan spesifik → gunakan weekIds (presisi)
+          params.weekIds = [Number(selectedWeek)]
+        } else if (weeks.length > 0) {
+          // Semua Pekan → gunakan startDate/endDate dari data weeks API
+          const sortedWeeks = [...weeks].sort((a, b) => a.weekNumber - b.weekNumber)
+          params.startDate = sortedWeeks[0].startDate
+          params.endDate = sortedWeeks[sortedWeeks.length - 1].endDate
+        }
+
+        const data = await mentoringApi.getMentoringRecap(params as MentoringRecapParams)
         setRecaps(data)
       } catch (error) {
         console.error("Failed to fetch mentoring recap", error)
@@ -97,7 +111,7 @@ export default function MentoringRecapPage() {
     }
 
     fetchRecap()
-  }, [selectedCampus, selectedGender, selectedTeam, selectedWeek, isSuperAdmin, myCampusId])
+  }, [selectedCampus, selectedGender, selectedTeam, selectedWeek, isSuperAdmin, myCampusId, weeks])
 
   // Reset team filter when campus filter changes
   const handleCampusChange = (campusId: number | null) => {
@@ -190,7 +204,7 @@ export default function MentoringRecapPage() {
                   <SelectValue placeholder="Semua Pekan" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ALL">Semua Pekan</SelectItem>
+                  <SelectItem value="ALL">Semua Pekan (2 bulan terakhir)</SelectItem>
                   {weeks.map((w) => (
                     <SelectItem key={w.id} value={String(w.id)}>
                       Pekan {w.weekNumber} ({w.startDate} s.d. {w.endDate})
@@ -276,7 +290,19 @@ export default function MentoringRecapPage() {
           <h2 className="text-xl font-bold text-foreground">Daftar Kehadiran</h2>
           {currentWeek && (
             <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-muted text-muted-foreground">
-              Pekan Berjalan: Pekan {currentWeek.weekNumber}
+              Pekan Berjalan: {selectedWeek === "ALL"
+                ? (() => {
+                    if (weeks.length === 0) return `Pekan ${currentWeek.weekNumber}`;
+                    const sorted = [...weeks].sort((a, b) => a.weekNumber - b.weekNumber);
+                    return `Semua (${weeks.length} pekan) · ${sorted[0].startDate} s.d. ${sorted[sorted.length - 1].endDate}`;
+                  })()
+                : (() => {
+                    const w = weeks.find(w => String(w.id) === selectedWeek);
+                    return w 
+                      ? `Pekan ${w.weekNumber} · ${w.startDate} s.d. ${w.endDate}` 
+                      : `Pekan ${currentWeek.weekNumber}`;
+                  })()
+              }
             </span>
           )}
         </div>

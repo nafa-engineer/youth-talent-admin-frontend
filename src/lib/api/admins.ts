@@ -22,10 +22,7 @@ export const adminsApi = {
     return response.data;
   },
 
-  updateAdmin: async (id: number, data: AdminRequestDto): Promise<AdminDto> => {
-    const response = await apiClient.put<AdminDto>(API_ROUTES.ADMIN_DETAIL(id), data);
-    return response.data;
-  },
+
 
   deactivateAdmin: async (id: number): Promise<AdminDto> => {
     const response = await apiClient.put<AdminDto>(API_ROUTES.ADMIN_DEACTIVATE(id));

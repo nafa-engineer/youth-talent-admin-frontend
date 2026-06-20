@@ -23,6 +23,7 @@ export const API_ROUTES = {
   
   WEEKS_CURRENT: '/api/v1/weeks/current',
   WEEK_DETAIL: (id: number | string) => `/api/v1/weeks/${id}`,
+  WEEKS: '/api/v1/weeks',
   
   ADMIN_PROFILE: '/api/v1/admins/profile',
   ADMINS: '/api/v1/admins',

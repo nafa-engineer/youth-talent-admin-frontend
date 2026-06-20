@@ -15,7 +15,7 @@ import { Input } from "../../../../components/ui/input"
 import { Card, CardContent } from "../../../../components/ui/card"
 import { formatDate } from "../../../../lib/utils"
 import { toast } from "sonner"
-import { Plus, Search, Edit2, ShieldAlert, ArrowLeftRight } from "lucide-react"
+import { Plus, Search, ShieldAlert, ArrowLeftRight } from "lucide-react"
 
 export default function AdminsPage() {
   // Enforce Super Admin only
@@ -28,7 +28,6 @@ export default function AdminsPage() {
 
   // Form Modal States
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const [selectedAdminForEdit, setSelectedAdminForEdit] = useState<AdminDto | null>(null)
 
   // Transfer Modal States
   const [isTransferOpen, setIsTransferOpen] = useState(false)
@@ -53,12 +52,6 @@ export default function AdminsPage() {
   }, [fetchAdmins])
 
   const handleCreateNew = () => {
-    setSelectedAdminForEdit(null)
-    setIsFormOpen(true)
-  }
-
-  const handleEdit = (admin: AdminDto) => {
-    setSelectedAdminForEdit(admin)
     setIsFormOpen(true)
   }
 
@@ -152,16 +145,6 @@ export default function AdminsPage() {
 
         return (
           <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
-            {/* Edit */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleEdit(row)}
-              className="h-8 w-8 text-muted-foreground hover:text-accent-foreground"
-              title="Edit Akun"
-            >
-              <Edit2 className="h-4 w-4" />
-            </Button>
 
             {/* Transfer Kampus (Hanya untuk Admin biasa, bukan Super Admin) */}
             {!isSuper && (
@@ -235,11 +218,10 @@ export default function AdminsPage() {
         emptyMessage="Tidak ada data admin yang ditemukan."
       />
 
-      {/* Admin Create/Edit Form Modal */}
+      {/* Admin Create Form Modal */}
       <AdminFormModal
         open={isFormOpen}
         onOpenChange={setIsFormOpen}
-        admin={selectedAdminForEdit}
         onSuccess={fetchAdmins}
       />
 

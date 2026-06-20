@@ -6,7 +6,9 @@ export interface MentoringRecapParams {
   campusId?: number | string;
   gender?: 'PRIA' | 'WANITA';
   teamId?: number | string;
-  weekId?: number | string;
+  weekIds?: number[];
+  startDate?: string;
+  endDate?: string;
 }
 
 export const mentoringApi = {

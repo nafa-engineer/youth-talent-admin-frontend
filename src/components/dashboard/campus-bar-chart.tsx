@@ -80,7 +80,7 @@ export function CampusBarChart() {
                   tickFormatter={(value) => `${value}`}
                 />
                 <Tooltip 
-                  cursor={{ fill: 'hsl(var(--primary) / 0.1)' }}
+                  cursor={{ fill: '#e4e6eb' }}
                   contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)' }}
                   formatter={(value) => [value, 'Total Peserta']}
                 />

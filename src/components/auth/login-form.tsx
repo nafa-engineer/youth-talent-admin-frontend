@@ -94,6 +94,7 @@ export function LoginForm() {
               type="password"
               {...register('password')}
               disabled={isLoading}
+              placeholder='*********'
             />
             {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
           </div>
