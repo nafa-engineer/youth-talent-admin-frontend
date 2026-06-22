@@ -44,10 +44,12 @@ apiClient.interceptors.response.use(
     if (error.response) {
       const { status } = error.response;
       
-      if (status === 401) {
+      if (status === 401 || status === 403) {
         if (typeof window !== 'undefined') {
-          localStorage.removeItem('auth-storage');
+          // Jangan redirect jika sudah di halaman login (agar login form
+          // bisa menampilkan pesan error dari response 401 via toast)
           if (window.location.pathname !== '/login') {
+            localStorage.removeItem('auth-storage');
             window.location.href = '/login?expired=true';
           }
         }

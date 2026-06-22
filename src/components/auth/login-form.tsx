@@ -52,8 +52,8 @@ export function LoginForm() {
       router.push(ROUTES.DASHBOARD);
     } catch (error) {
       console.error('Login error:', error);
-      const err = error as { response?: { data?: { message?: string } } };
-      toast.error(err.response?.data?.message || 'Gagal melakukan login. Periksa kembali email dan kata sandi Anda.');
+      const err = error as { response?: { data?: { responseMessage?: string; message?: string } } };
+      toast.error(err.response?.data?.responseMessage || err.response?.data?.message || 'Gagal melakukan login...');
     } finally {
       setIsLoading(false);
     }
@@ -94,6 +94,7 @@ export function LoginForm() {
               type="password"
               {...register('password')}
               disabled={isLoading}
+              placeholder='*********'
             />
             {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
           </div>

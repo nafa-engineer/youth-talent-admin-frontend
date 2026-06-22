@@ -2,12 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { customersApi } from '../../lib/api/customers';
+import { teamsApi } from '../../lib/api/teams';
 import { campusesApi } from '../../lib/api/campuses';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Skeleton } from '../ui/skeleton';
 
-export function CampusBarChart() {
+export function TeamCampusBarChart() {
   const [data, setData] = useState<{ name: string; total: number }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -19,7 +19,7 @@ export function CampusBarChart() {
         
         // Fetch count for each campus in parallel
         const countPromises = campuses.map(campus => 
-          customersApi.getCustomerCount({ campusId: campus.id })
+          teamsApi.getTeamCount({ campusId: campus.id })
             .then(total => ({ name: campus.name, total }))
         );
         
@@ -30,7 +30,7 @@ export function CampusBarChart() {
         
         setData(results);
       } catch (error) {
-        console.error('Failed to fetch campus distribution data', error);
+        console.error('Failed to fetch campus team distribution data', error);
       } finally {
         setIsLoading(false);
       }
@@ -42,7 +42,7 @@ export function CampusBarChart() {
   return (
     <Card className="col-span-1 lg:col-span-2 border-primary/10 shadow-sm h-full">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold text-foreground">Distribusi Peserta per Kampus</CardTitle>
+        <CardTitle className="text-lg font-semibold text-foreground">Distribusi Kelompok per Kampus</CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -55,7 +55,7 @@ export function CampusBarChart() {
           </div>
         ) : data.length === 0 ? (
           <div className="flex justify-center items-center h-[300px] text-muted-foreground text-sm">
-            Tidak ada data distribusi kampus
+            Tidak ada data distribusi kelompok per kampus
           </div>
         ) : (
           <div className="h-[300px] w-full">
@@ -82,7 +82,7 @@ export function CampusBarChart() {
                 <Tooltip 
                   cursor={{ fill: '#e4e6eb' }}
                   contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)' }}
-                  formatter={(value) => [value, 'Total Peserta']}
+                  formatter={(value) => [value, 'Total Kelompok']}
                 />
                 <Bar dataKey="total" radius={[4, 4, 0, 0]}>
                   {data.map((entry, index) => (

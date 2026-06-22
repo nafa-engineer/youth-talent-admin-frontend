@@ -23,6 +23,7 @@ export const API_ROUTES = {
   
   WEEKS_CURRENT: '/api/v1/weeks/current',
   WEEK_DETAIL: (id: number | string) => `/api/v1/weeks/${id}`,
+  WEEKS: '/api/v1/weeks',
   
   ADMIN_PROFILE: '/api/v1/admins/profile',
   ADMINS: '/api/v1/admins',
@@ -37,8 +38,12 @@ export const API_ROUTES = {
   TEAMS: '/api/v1/teams',
   TEAM_DETAIL: (id: number | string) => `/api/v1/teams/${id}`,
   TEAMS_BY_CAMPUS: (campusId: number | string) => `/api/v1/teams/campus/${campusId}`,
+  TEAMS_COUNT: '/api/v1/teams/count',
   
   MENTORING_RECAP: '/api/v1/mentoring/recap',
+  MENTORING_RECAP_SUMMARY: '/api/v1/mentoring/recap/summary',
+  
+  DEED_SCORE_AVERAGE: '/api/v1/deed-score/average',
 };
 
 export const GENDER_OPTIONS = [

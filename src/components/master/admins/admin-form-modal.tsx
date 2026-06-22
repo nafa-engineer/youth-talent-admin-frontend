@@ -23,23 +23,18 @@ import { toast } from "sonner"
 interface AdminFormModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  admin: AdminDto | null // If editing, otherwise null for creating
   onSuccess: () => void
 }
 
-export function AdminFormModal({ open, onOpenChange, admin, onSuccess }: AdminFormModalProps) {
+export function AdminFormModal({ open, onOpenChange, onSuccess }: AdminFormModalProps) {
   const [campuses, setCampuses] = useState<CampusDto[]>([])
   const [isLoadingCampuses, setIsLoadingCampuses] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const isEdit = !!admin
-
   const adminSchema = z.object({
     name: z.string().min(3, "Nama admin minimal 3 karakter"),
     email: z.string().email("Format email tidak valid"),
-    password: isEdit
-      ? z.string().optional()
-      : z.string().min(6, "Password minimal 6 karakter"),
+    password: z.string().min(6, "Password minimal 6 karakter"),
     campusId: z.number().min(1, "Kampus penugasan harus dipilih"),
   })
 
@@ -84,47 +79,33 @@ export function AdminFormModal({ open, onOpenChange, admin, onSuccess }: AdminFo
     fetchCampuses()
   }, [open])
 
-  // Reset form when modal opens / editing target changes
+  // Reset form when modal opens
   useEffect(() => {
     if (open) {
-      if (admin) {
-        reset({
-          name: admin.name,
-          email: admin.email,
-          password: "",
-          campusId: admin.campusId || undefined,
-        })
-      } else {
-        reset({
-          name: "",
-          email: "",
-          password: "",
-          campusId: undefined,
-        })
-      }
+      reset({
+        name: "",
+        email: "",
+        password: "",
+        campusId: undefined,
+      })
     }
-  }, [open, admin, reset])
+  }, [open, reset])
 
   const onSubmit = async (values: AdminFormValues) => {
     setIsSubmitting(true)
-    const loaderId = toast.loading(isEdit ? "Memperbarui admin..." : "Membuat admin...")
+    const loaderId = toast.loading("Membuat admin...")
     try {
       // Mapping adminGroupId to 2 (regular ADMIN) based on user rule
       const payload = {
         name: values.name,
         email: values.email,
-        password: values.password || undefined,
+        password: values.password,
         adminGroupId: 2, // 2 = ADMIN
         campusId: values.campusId,
       }
 
-      if (isEdit && admin) {
-        await adminsApi.updateAdmin(admin.id, payload)
-        toast.success("Admin berhasil diperbarui!", { id: loaderId })
-      } else {
-        await adminsApi.createAdmin(payload)
-        toast.success("Admin baru berhasil dibuat!", { id: loaderId })
-      }
+      await adminsApi.createAdmin(payload)
+      toast.success("Admin baru berhasil dibuat!", { id: loaderId })
       onSuccess()
       onOpenChange(false)
     } catch (error) {
@@ -141,7 +122,7 @@ export function AdminFormModal({ open, onOpenChange, admin, onSuccess }: AdminFo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent onClose={() => onOpenChange(false)}>
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Edit Akun Admin" : "Tambah Admin Baru"}</DialogTitle>
+          <DialogTitle>Tambah Admin Baru</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-2">
@@ -172,11 +153,9 @@ export function AdminFormModal({ open, onOpenChange, admin, onSuccess }: AdminFo
             )}
           </div>
 
-          {/* Password (Hanya wajib saat tambah baru) */}
+          {/* Password */}
           <div className="space-y-1">
-            <Label htmlFor="password">
-              Password {isEdit && <span className="text-xs text-muted-foreground">(Kosongkan jika tidak diubah)</span>}
-            </Label>
+            <Label htmlFor="password">Password</Label>
             <Input
               id="password"
               type="password"
@@ -221,7 +200,7 @@ export function AdminFormModal({ open, onOpenChange, admin, onSuccess }: AdminFo
               Batal
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isEdit ? "Simpan Perubahan" : "Buat Admin"}
+              Buat Admin
             </Button>
           </DialogFooter>
         </form>

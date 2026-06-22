@@ -91,7 +91,8 @@ export function TeamFormModal({ open, onOpenChange, team, onSuccess }: TeamFormM
     }
 
     fetchCampuses()
-  }, [open, isSuperAdmin, getCampusId, setValue])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, isSuperAdmin])
 
   // Populate data when editing
   useEffect(() => {
@@ -110,7 +111,8 @@ export function TeamFormModal({ open, onOpenChange, team, onSuccess }: TeamFormM
         campusId: !isSuperAdmin ? (getCampusId() || undefined) : undefined,
       })
     }
-  }, [open, team, reset, isSuperAdmin, getCampusId])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, team, isSuperAdmin])
 
   const onSubmit = async (values: TeamFormValues) => {
     setIsSubmitting(true)

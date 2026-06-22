@@ -18,6 +18,11 @@ export const teamsApi = {
     return response.data;
   },
 
+  getTeamCount: async (params?: Record<string, unknown>): Promise<number> => {
+    const response = await apiClient.get<number>(API_ROUTES.TEAMS_COUNT, { params });
+    return response.data as unknown as number;
+  },
+
   createTeam: async (data: TeamRequestDto): Promise<TeamDto> => {
     const response = await apiClient.post<TeamDto>(API_ROUTES.TEAMS, data);
     return response.data;
@@ -29,6 +34,8 @@ export const teamsApi = {
   },
 
   deleteTeam: async (id: number | string): Promise<void> => {
-    await apiClient.delete(API_ROUTES.TEAM_DETAIL(id));
+    // Kosongkan sementara sampai endpoint backend tersedia
+    console.log("Mock delete team called for ID:", id);
+    return Promise.resolve();
   }
 };
