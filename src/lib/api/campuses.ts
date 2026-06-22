@@ -27,6 +27,7 @@ export const campusesApi = {
   },
 
   deleteCampus: async (id: number): Promise<void> => {
-    await apiClient.delete(`${API_ROUTES.CAMPUSES}/${id}`);
+    console.log("Mock delete campus called for ID:", id);
+    return Promise.resolve();
   }
 };

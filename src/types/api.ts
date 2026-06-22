@@ -100,6 +100,7 @@ export interface TeamDto {
   grade: number;
   campusId: number;
   campusName: string;
+  gender?: Gender;
 }
 
 export interface TeamRequestDto {
@@ -156,4 +157,30 @@ export interface AdminRequestDto {
 
 export interface AdminTransferCampusRequestDto {
   campusId: number;
+}
+
+// Mentoring Summary DTO
+export interface MentoringAttendanceSummaryDto {
+  campusId: number | null;
+  grade: number | null;
+  gender: Gender | null;
+  totalCustomers: number;
+  averageAttendancePercentage: number;
+}
+
+// Deed Score Average DTOs
+export interface ActivityAverageDto {
+  deedActivityId: number;
+  activityName: string;
+  unit: string;
+  averageValue: number;
+}
+
+export interface DeedScoreAverageDto {
+  campusId: number | null;
+  campusName: string | null;
+  grade: number | null;
+  gender: Gender | null;
+  totalCustomers: number;
+  activities: ActivityAverageDto[];
 }

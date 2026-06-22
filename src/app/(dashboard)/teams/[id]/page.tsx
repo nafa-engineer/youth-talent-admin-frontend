@@ -97,18 +97,7 @@ export default function TeamDetailPage({ params }: PageProps) {
   }
 
   const handleDeleteTeam = async () => {
-    if (!team) return
-    if (window.confirm(`Apakah Anda yakin ingin menghapus tim "${team.name}"? Semua peserta dalam tim ini akan dilepas asosiasinya.`)) {
-      const loaderId = toast.loading("Sedang menghapus tim...")
-      try {
-        await teamsApi.deleteTeam(team.id)
-        toast.success("Tim berhasil dihapus!", { id: loaderId })
-        router.push("/teams")
-      } catch (error) {
-        console.error("Failed to delete team", error)
-        toast.error("Gagal menghapus tim", { id: loaderId })
-      }
-    }
+    toast.info("Fitur ini belum tersedia")
   }
 
   const handleTransferSingle = (member: CustomerDto) => {

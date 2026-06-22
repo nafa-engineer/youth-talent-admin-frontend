@@ -26,18 +26,18 @@ export function CampusFilter({ value, onChange, className }: CampusFilterProps) 
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // If Admin, they are locked to their own campus, no need to fetch all campuses
+    // If Admin, they are locked to their own campus
     if (!isSuperAdmin) {
-      if (campusId) {
-        // Automatically set the value to their campus if not already
-        if (value !== campusId) {
-          onChange(campusId);
-        }
+      if (campusId && value !== campusId) {
+        onChange(campusId);
       }
-      return;
     }
+  }, [isSuperAdmin, campusId, value, onChange]);
 
+  useEffect(() => {
     // If Super Admin, fetch all campuses
+    if (!isSuperAdmin) return;
+
     const fetchCampuses = async () => {
       setIsLoading(true);
       try {
@@ -52,7 +52,7 @@ export function CampusFilter({ value, onChange, className }: CampusFilterProps) 
     };
 
     fetchCampuses();
-  }, [isSuperAdmin, campusId, value, onChange]);
+  }, [isSuperAdmin]);
 
   // For Admin, just show a disabled select with their campus name
   if (!isSuperAdmin) {

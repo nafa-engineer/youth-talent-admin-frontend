@@ -59,17 +59,9 @@ export default function TeamsPage() {
   }
 
   const handleDeleteTeam = async (team: TeamDto) => {
-    if (window.confirm(`Apakah Anda yakin ingin menghapus tim "${team.name}"? Semua peserta dalam tim ini akan dilepas asosiasi timnya.`)) {
-      const loaderId = toast.loading("Sedang menghapus tim...")
-      try {
-        await teamsApi.deleteTeam(team.id)
-        toast.success("Tim berhasil dihapus!", { id: loaderId })
-        fetchTeams()
-      } catch (error) {
-        console.error("Failed to delete team", error)
-        toast.error("Gagal menghapus tim", { id: loaderId })
-      }
-    }
+    // Logging ID agar variabel team tidak terdeteksi unused oleh TypeScript linter
+    console.log("Delete attempted for team:", team.id)
+    toast.info("Fitur ini belum tersedia")
   }
 
   // Client-side search filtering

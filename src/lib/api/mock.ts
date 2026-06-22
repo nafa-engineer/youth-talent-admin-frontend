@@ -87,12 +87,12 @@ const mockDeedActivities: DeedActivityDto[] = [
 ];
 
 const mockTeams: TeamDto[] = [
-  { id: 1, name: 'Tim Fatih JKT', code: 'TF-JKT', grade: 1, campusId: 1, campusName: 'Kampus Jakarta Selatan' },
-  { id: 2, name: 'Tim Umar JKT', code: 'TU-JKT', grade: 2, campusId: 1, campusName: 'Kampus Jakarta Selatan' },
-  { id: 3, name: 'Tim Aisyah JKT', code: 'TA-JKT', grade: 1, campusId: 1, campusName: 'Kampus Jakarta Selatan' },
-  { id: 4, name: 'Tim Salahuddin BDG', code: 'TS-BDG', grade: 1, campusId: 2, campusName: 'Kampus Bandung' },
-  { id: 5, name: 'Tim Khadijah BDG', code: 'TK-BDG', grade: 2, campusId: 2, campusName: 'Kampus Bandung' },
-  { id: 6, name: 'Tim Khalid SUB', code: 'TK-SUB', grade: 1, campusId: 3, campusName: 'Kampus Surabaya' },
+  { id: 1, name: 'Tim Fatih JKT', code: 'TF-JKT', grade: 1, campusId: 1, campusName: 'Kampus Jakarta Selatan', gender: 'PRIA' },
+  { id: 2, name: 'Tim Umar JKT', code: 'TU-JKT', grade: 2, campusId: 1, campusName: 'Kampus Jakarta Selatan', gender: 'PRIA' },
+  { id: 3, name: 'Tim Aisyah JKT', code: 'TA-JKT', grade: 1, campusId: 1, campusName: 'Kampus Jakarta Selatan', gender: 'WANITA' },
+  { id: 4, name: 'Tim Salahuddin BDG', code: 'TS-BDG', grade: 1, campusId: 2, campusName: 'Kampus Bandung', gender: 'PRIA' },
+  { id: 5, name: 'Tim Khadijah BDG', code: 'TK-BDG', grade: 2, campusId: 2, campusName: 'Kampus Bandung', gender: 'WANITA' },
+  { id: 6, name: 'Tim Khalid SUB', code: 'TK-SUB', grade: 1, campusId: 3, campusName: 'Kampus Surabaya', gender: 'PRIA' },
 ];
 
 const mockCustomers: CustomerDto[] = [
@@ -535,7 +535,8 @@ export const setupMockApi = () => {
       code,
       grade: Number(grade),
       campusId: Number(campusId),
-      campusName: campus.name
+      campusName: campus.name,
+      gender: 'PRIA'
     };
     mockTeams.push(newTeam);
     return [200, {
@@ -717,6 +718,84 @@ export const setupMockApi = () => {
       status: 200,
       message: "Kampus Admin berhasil ditransfer",
       data: mockAdmins[adminIndex]
+    }];
+  });
+
+  // Mock Teams Count
+  mock.onGet(API_ROUTES.TEAMS_COUNT).reply((config) => {
+    const params = config.params || {};
+    let filtered = [...mockTeams];
+    if (params.campusId) {
+      filtered = filtered.filter(t => t.campusId === Number(params.campusId));
+    }
+    if (params.gender) {
+      filtered = filtered.filter(t => t.gender === params.gender);
+    }
+    if (params.grade) {
+      filtered = filtered.filter(t => t.grade === Number(params.grade));
+    }
+    return [200, {
+      status: 200,
+      message: "Success",
+      data: filtered.length
+    }];
+  });
+
+  // Mock Mentoring Recap Summary
+  mock.onGet(API_ROUTES.MENTORING_RECAP_SUMMARY).reply((config) => {
+    const params = config.params || {};
+    // Calculate a mock attendance percentage based on input params to make charts look dynamic
+    let attendance = 75.0;
+    if (params.gender === 'PRIA') attendance = 82.4;
+    if (params.gender === 'WANITA') attendance = 78.6;
+    if (params.grade) {
+      // Vary by grade
+      const gradesVal = [85.5, 78.2, 91.0, 69.4, 88.1];
+      attendance = gradesVal[(Number(params.grade) - 1) % 5];
+    } else if (params.campusId) {
+      // Vary by campus
+      const campusVal = [88.5, 74.2, 80.6, 92.1];
+      attendance = campusVal[(Number(params.campusId) - 1) % 4];
+    }
+    return [200, {
+      status: 200,
+      message: "Success",
+      data: {
+        campusId: params.campusId ? Number(params.campusId) : null,
+        grade: params.grade ? Number(params.grade) : null,
+        gender: params.gender || null,
+        totalCustomers: 12,
+        averageAttendancePercentage: attendance
+      }
+    }];
+  });
+
+  // Mock Deed Score Average
+  mock.onGet(API_ROUTES.DEED_SCORE_AVERAGE).reply((config) => {
+    const params = config.params || {};
+    // Vary based on gender, grade, campus to make charts look dynamic and cool
+    let factor = 1.0;
+    if (params.gender === 'PRIA') factor = 1.1;
+    if (params.gender === 'WANITA') factor = 0.95;
+    if (params.grade) factor *= (1 + (Number(params.grade) * 0.05));
+    if (params.campusId) factor *= (0.9 + (Number(params.campusId) * 0.03));
+
+    return [200, {
+      status: 200,
+      message: "Success",
+      data: {
+        campusId: params.campusId ? Number(params.campusId) : null,
+        campusName: null,
+        grade: params.grade ? Number(params.grade) : null,
+        gender: params.gender || null,
+        totalCustomers: 12,
+        activities: [
+          { deedActivityId: 1, activityName: "Shalat Jamaah", unit: "kali", averageValue: 3.8 * factor },
+          { deedActivityId: 2, activityName: "Tilawah Qur'an", unit: "halaman", averageValue: 5.2 * factor },
+          { deedActivityId: 3, activityName: "Shaum Sunnah", unit: "hari", averageValue: 0.4 * factor },
+          { deedActivityId: 4, activityName: "Sedekah Harian", unit: "rupiah", averageValue: 15000 * factor }
+        ]
+      }
     }];
   });
 

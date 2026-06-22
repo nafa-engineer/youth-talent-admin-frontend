@@ -37,24 +37,34 @@ export default function LeaderboardPage() {
   // Loading States
   const [isLoadingData, setIsLoadingData] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isLoadingFilterData, setIsLoadingFilterData] = useState(false)
 
   // Fetch weeks and deed activities on load
   useEffect(() => {
     const fetchInitData = async () => {
+      setIsLoadingFilterData(true)
       try {
-        const weeksData = [
-          { id: 1, year: 2026, weekNumber: 23, startDate: '2026-06-08', endDate: '2026-06-14' },
-          { id: 2, year: 2026, weekNumber: 24, startDate: '2026-06-15', endDate: '2026-06-21' },
-          { id: 3, year: 2026, weekNumber: 25, startDate: '2026-06-22', endDate: '2026-06-28' },
-        ]
-        setWeeks(weeksData)
+        // Fetch current week first
+        const curWeek = await weeksApi.getCurrentWeek()
+
+        // Fetch weeks from API based on date range (last 2 months)
+        const today = new Date()
+        const twoMonthsAgo = new Date()
+        twoMonthsAgo.setMonth(today.getMonth() - 2)
+
+        const startDateStr = twoMonthsAgo.toISOString().split('T')[0]
+        const endDateStr = today.toISOString().split('T')[0]
+
+        const weeksList = await weeksApi.getWeeksByDateRange(startDateStr, endDateStr)
+        // Sort weeks descending so latest week is shown first in dropdown
+        weeksList.sort((a, b) => b.weekNumber - a.weekNumber)
+        setWeeks(weeksList)
 
         // Set current week as default
-        const curWeek = await weeksApi.getCurrentWeek()
         if (curWeek) {
           setSelectedWeek(String(curWeek.id))
-        } else {
-          setSelectedWeek(String(weeksData[0].id))
+        } else if (weeksList.length > 0) {
+          setSelectedWeek(String(weeksList[0].id))
         }
 
         const actsData = await deedActivitiesApi.getDeedActivities()
@@ -62,6 +72,8 @@ export default function LeaderboardPage() {
       } catch (error) {
         console.error("Failed to load initial leaderboard filter data", error)
         toast.error("Gagal memuat parameter klasemen")
+      } finally {
+        setIsLoadingFilterData(false)
       }
     }
 
@@ -150,7 +162,7 @@ export default function LeaderboardPage() {
 
         <Button
           onClick={handleGenerateLeaderboard}
-          disabled={isGenerating || !selectedWeek}
+          disabled={isGenerating || isLoadingFilterData || !selectedWeek}
           className="w-full sm:w-auto shadow-md hover:shadow-lg transition-all"
         >
           <RefreshCw className={`mr-2 h-4 w-4 ${isGenerating ? "animate-spin" : ""}`} />
@@ -175,9 +187,13 @@ export default function LeaderboardPage() {
               <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                 <Calendar className="h-3 w-3 text-muted-foreground" /> Pekan
               </label>
-              <Select value={selectedWeek} onValueChange={(val) => setSelectedWeek(val || "")}>
+              <Select 
+                value={selectedWeek} 
+                onValueChange={(val) => setSelectedWeek(val || "")}
+                disabled={isLoadingFilterData}
+              >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih Pekan" />
+                  <SelectValue placeholder={isLoadingFilterData ? "Memuat..." : "Pilih Pekan"} />
                 </SelectTrigger>
                 <SelectContent>
                   {weeks.map((w) => (
@@ -194,9 +210,13 @@ export default function LeaderboardPage() {
               <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                 <Award className="h-3 w-3 text-muted-foreground" /> Kategori Klasemen
               </label>
-              <Select value={selectedActivity} onValueChange={(val) => setSelectedActivity(val || "GLOBAL")}>
+              <Select 
+                value={selectedActivity} 
+                onValueChange={(val) => setSelectedActivity(val || "GLOBAL")}
+                disabled={isLoadingFilterData}
+              >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih Kategori" />
+                  <SelectValue placeholder={isLoadingFilterData ? "Memuat..." : "Pilih Kategori"} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="GLOBAL">Klasemen Umum (Global)</SelectItem>

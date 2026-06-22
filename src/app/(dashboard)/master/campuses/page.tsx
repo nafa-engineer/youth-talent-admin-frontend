@@ -53,23 +53,8 @@ export default function CampusesPage() {
   }
 
   const handleDelete = async (campus: CampusDto) => {
-    if (
-      window.confirm(
-        `Apakah Anda yakin ingin menghapus kampus "${campus.name}"? Tindakan ini akan diblokir jika kampus masih digunakan oleh data lain.`
-      )
-    ) {
-      const loaderId = toast.loading("Sedang menghapus kampus...")
-      try {
-        await campusesApi.deleteCampus(campus.id)
-        toast.success("Kampus berhasil dihapus!", { id: loaderId })
-        fetchCampuses()
-      } catch (error) {
-        console.error("Failed to delete campus", error)
-        const err = error as { response?: { data?: { message?: string } } };
-        const errorMsg = err.response?.data?.message || "Gagal menghapus kampus"
-        toast.error(errorMsg, { id: loaderId })
-      }
-    }
+    console.log("Delete attempted for campus:", campus.id)
+    toast.info("Fitur ini belum tersedia")
   }
 
   // Filter campuses by search query
