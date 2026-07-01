@@ -524,7 +524,7 @@ export const setupMockApi = () => {
   });
 
   mock.onPost(API_ROUTES.TEAMS).reply((config) => {
-    const { name, code, grade, campusId } = JSON.parse(config.data);
+    const { name, code, grade, campusId, gender } = JSON.parse(config.data);
     const campus = campuses.find(c => c.id === Number(campusId));
     if (!campus) {
       return [400, { status: 400, message: "Kampus tidak valid" }];
@@ -536,7 +536,7 @@ export const setupMockApi = () => {
       grade: Number(grade),
       campusId: Number(campusId),
       campusName: campus.name,
-      gender: 'PRIA'
+      gender: gender || 'PRIA'
     };
     mockTeams.push(newTeam);
     return [200, {
@@ -549,7 +549,7 @@ export const setupMockApi = () => {
   mock.onPut(/\/api\/v1\/teams\/\d+/).reply((config) => {
     const urlParts = config.url?.split('/');
     const id = parseInt(urlParts?.[urlParts.length - 1] || '0', 10);
-    const { name, code, grade, campusId } = JSON.parse(config.data);
+    const { name, code, grade, campusId, gender } = JSON.parse(config.data);
     const teamIndex = mockTeams.findIndex(t => t.id === id);
     if (teamIndex === -1) {
       return [404, { status: 404, message: "Tim tidak ditemukan" }];
@@ -565,7 +565,8 @@ export const setupMockApi = () => {
       code,
       grade: Number(grade),
       campusId: Number(campusId),
-      campusName: campus.name
+      campusName: campus.name,
+      gender: gender || mockTeams[teamIndex].gender
     };
 
     // Update customer records that belong to this team to reflect new name

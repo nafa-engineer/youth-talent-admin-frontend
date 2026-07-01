@@ -108,6 +108,7 @@ export interface TeamRequestDto {
   code: string;
   grade: number;
   campusId: number;
+  gender: Gender;
 }
 
 // Mentoring DTOs
