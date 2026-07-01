@@ -26,6 +26,7 @@ const teamSchema = z.object({
   code: z.string().min(2, "Kode tim minimal 2 karakter"),
   grade: z.number().min(1, "Kelas minimal 1").max(12, "Kelas maksimal 12"),
   campusId: z.number().min(1, "Kampus harus dipilih"),
+  gender: z.enum(["PRIA", "WANITA"], { message: "Gender harus dipilih" }),
 })
 
 type TeamFormValues = z.infer<typeof teamSchema>
@@ -59,11 +60,13 @@ export function TeamFormModal({ open, onOpenChange, team, onSuccess }: TeamFormM
       code: "",
       grade: 1,
       campusId: undefined,
+      gender: "PRIA",
     },
   })
 
-  // Selected campus watchers
+  // Selected campus and gender watchers
   const campusIdValue = watch("campusId")
+  const genderValue = watch("gender")
 
   // Load campuses if Super Admin
   useEffect(() => {
@@ -102,6 +105,7 @@ export function TeamFormModal({ open, onOpenChange, team, onSuccess }: TeamFormM
         code: team.code,
         grade: team.grade,
         campusId: team.campusId,
+        gender: team.gender || "PRIA",
       })
     } else if (open && !team) {
       reset({
@@ -109,6 +113,7 @@ export function TeamFormModal({ open, onOpenChange, team, onSuccess }: TeamFormM
         code: "",
         grade: 1,
         campusId: !isSuperAdmin ? (getCampusId() || undefined) : undefined,
+        gender: "PRIA",
       })
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -169,7 +174,7 @@ export function TeamFormModal({ open, onOpenChange, team, onSuccess }: TeamFormM
             )}
           </div>
 
-          {/* Kelas & Kampus (Grid) */}
+          {/* Kelas & Gender (Grid) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Kelas / Grade */}
             <div className="space-y-1">
@@ -187,36 +192,56 @@ export function TeamFormModal({ open, onOpenChange, team, onSuccess }: TeamFormM
               )}
             </div>
 
-            {/* Kampus */}
+            {/* Gender */}
             <div className="space-y-1">
-              <Label htmlFor="campusId">Kampus</Label>
-              {!isSuperAdmin ? (
-                <Input
-                  id="campusIdDisabled"
-                  disabled
-                  value={team?.campusName || "Kampus Anda"}
-                />
-              ) : (
-                <Select
-                  value={campusIdValue ? String(campusIdValue) : ""}
-                  onValueChange={(val) => setValue("campusId", Number(val), { shouldValidate: true })}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={isLoadingCampuses ? "Memuat..." : "Pilih Kampus"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {campuses.map((c) => (
-                      <SelectItem key={c.id} value={String(c.id)}>
-                        {c.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-              {errors.campusId && (
-                <p className="text-xs font-semibold text-rose-500">{errors.campusId.message}</p>
+              <Label htmlFor="gender">Gender</Label>
+              <Select
+                value={genderValue || ""}
+                onValueChange={(val) => setValue("gender", val as "PRIA" | "WANITA", { shouldValidate: true })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Pilih Gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PRIA">Pria (Ikhwan)</SelectItem>
+                  <SelectItem value="WANITA">Wanita (Akhwat)</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.gender && (
+                <p className="text-xs font-semibold text-rose-500">{errors.gender.message}</p>
               )}
             </div>
+          </div>
+
+          {/* Kampus */}
+          <div className="space-y-1">
+            <Label htmlFor="campusId">Kampus</Label>
+            {!isSuperAdmin ? (
+              <Input
+                id="campusIdDisabled"
+                disabled
+                value={team?.campusName || "Kampus Anda"}
+              />
+            ) : (
+              <Select
+                value={campusIdValue ? String(campusIdValue) : ""}
+                onValueChange={(val) => setValue("campusId", Number(val), { shouldValidate: true })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={isLoadingCampuses ? "Memuat..." : "Pilih Kampus"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {campuses.map((c) => (
+                    <SelectItem key={c.id} value={String(c.id)}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {errors.campusId && (
+              <p className="text-xs font-semibold text-rose-500">{errors.campusId.message}</p>
+            )}
           </div>
 
           <DialogFooter>
