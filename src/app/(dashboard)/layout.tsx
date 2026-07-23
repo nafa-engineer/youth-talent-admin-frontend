@@ -18,6 +18,7 @@ export default function DashboardLayout({
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsClient(true);
     if (hasHydrated && !isAuthenticated) {
       console.log('DashboardLayout redirecting to login. hasHydrated:', hasHydrated, 'isAuthenticated:', isAuthenticated);

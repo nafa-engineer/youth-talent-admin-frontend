@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { useAuth } from "../../../hooks/use-auth"
 import { authApi } from "../../../lib/api/auth"
 import { AdminDto } from "../../../types/api"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card"
@@ -12,7 +11,6 @@ import { User, Mail, MapPin, Calendar, Shield, Info, CheckCircle2, XCircle } fro
 import { formatDate } from "../../../lib/utils"
 
 export default function ProfilePage() {
-  const { user } = useAuth()
   const [profile, setProfile] = useState<AdminDto | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -30,7 +28,6 @@ export default function ProfilePage() {
       }
     }
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProfile()
   }, [])
 

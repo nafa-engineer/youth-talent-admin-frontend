@@ -15,8 +15,7 @@ import {
   Building, 
   Shield, 
   ChevronLeft,
-  ChevronRight,
-  Menu
+  ChevronRight
 } from 'lucide-react';
 import { Button } from '../ui/button';
 

@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { adminsApi } from "../../../lib/api/admins"
@@ -40,7 +40,7 @@ export function TransferCampusModal({ open, onOpenChange, admin, onSuccess }: Tr
   const {
     handleSubmit,
     setValue,
-    watch,
+    control,
     reset,
     formState: { errors },
   } = useForm<TransferFormValues>({
@@ -50,7 +50,7 @@ export function TransferCampusModal({ open, onOpenChange, admin, onSuccess }: Tr
     },
   })
 
-  const campusIdValue = watch("campusId")
+  const campusIdValue = useWatch({ control, name: "campusId" })
 
   // Load campuses
   useEffect(() => {

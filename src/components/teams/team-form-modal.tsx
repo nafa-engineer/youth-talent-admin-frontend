@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useAuth } from "../../hooks/use-auth"
@@ -50,7 +50,7 @@ export function TeamFormModal({ open, onOpenChange, team, onSuccess }: TeamFormM
     register,
     handleSubmit,
     setValue,
-    watch,
+    control,
     reset,
     formState: { errors },
   } = useForm<TeamFormValues>({
@@ -65,8 +65,8 @@ export function TeamFormModal({ open, onOpenChange, team, onSuccess }: TeamFormM
   })
 
   // Selected campus and gender watchers
-  const campusIdValue = watch("campusId")
-  const genderValue = watch("gender")
+  const campusIdValue = useWatch({ control, name: "campusId" })
+  const genderValue = useWatch({ control, name: "gender" })
 
   // Load campuses if Super Admin
   useEffect(() => {
