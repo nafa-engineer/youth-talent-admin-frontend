@@ -2,7 +2,6 @@
 
 import React, { use, useEffect, useState, useCallback } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { useAuth } from "../../../../hooks/use-auth"
 import { teamsApi } from "../../../../lib/api/teams"
 import { customersApi } from "../../../../lib/api/customers"
@@ -11,7 +10,7 @@ import { DataTable, ColumnDef } from "../../../../components/shared/data-table"
 import { TeamFormModal } from "../../../../components/teams/team-form-modal"
 import { TransferModal } from "../../../../components/teams/transfer-modal"
 import { Button } from "../../../../components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card"
+import { Card, CardContent } from "../../../../components/ui/card"
 import { ForbiddenPage } from "../../../../components/shared/forbidden-page"
 import { toast } from "sonner"
 import { 
@@ -24,8 +23,7 @@ import {
   ArrowLeftRight, 
   CheckSquare, 
   Square,
-  Mail,
-  UserCheck
+  Mail
 } from "lucide-react"
 
 interface PageProps {
@@ -33,7 +31,6 @@ interface PageProps {
 }
 
 export default function TeamDetailPage({ params }: PageProps) {
-  const router = useRouter()
   const { isSuperAdmin, getCampusId } = useAuth()
   const resolvedParams = use(params)
   const teamId = Number(resolvedParams.id)
@@ -84,7 +81,6 @@ export default function TeamDetailPage({ params }: PageProps) {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchTeamData()
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMembers()
   }, [fetchTeamData, fetchMembers])
 

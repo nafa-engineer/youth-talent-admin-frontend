@@ -78,8 +78,16 @@ export function TransferModal({ open, onOpenChange, selectedCustomers, onSuccess
       toast.success(`Berhasil memindahkan ${selectedCustomers.length} peserta!`, { id: toastId })
       onSuccess()
       onOpenChange(false)
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.responseMessage || error.response?.data?.message || "Gagal memindahkan peserta. Silakan coba lagi."
+    } catch (error: unknown) {
+      const errorData = (error as {
+        response?: {
+          data?: {
+            responseMessage?: string
+            message?: string
+          }
+        }
+      }).response?.data
+      const errorMessage = errorData?.responseMessage || errorData?.message || "Gagal memindahkan peserta. Silakan coba lagi."
       toast.error(errorMessage, { id: toastId })
     } finally {
       setIsSubmitting(false)

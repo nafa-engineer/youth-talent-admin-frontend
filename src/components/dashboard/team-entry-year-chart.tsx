@@ -48,6 +48,7 @@ export function TeamEntryYearChart({ campusId }: TeamEntryYearChartProps) {
   // 2. Fetch chart data when selectedTeamId changes
   useEffect(() => {
     if (selectedTeamId === null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setChartData([]);
       return;
     }

@@ -8,7 +8,6 @@ import {
   DeedActivityDto, 
   TeamDto, 
   CustomerDto, 
-  MentoringAttendanceRecapDto,
   DeedLeaderboardResponseDto,
   AdminDto
 } from '../../types/api';
@@ -358,7 +357,7 @@ export const setupMockApi = () => {
   // 6. Mock Mentoring Recap
   mock.onGet(API_ROUTES.MENTORING_RECAP).reply((config) => {
     const params = config.params || {};
-    let recaps = mockCustomers.map((c, i) => {
+    let recaps = mockCustomers.map((c) => {
       // Stable total session is 10. Attendance is between 6 and 10.
       const totalAttendance = 6 + (c.id % 5);
       return {
@@ -414,7 +413,7 @@ export const setupMockApi = () => {
     }];
   });
 
-  mock.onPost(API_ROUTES.LEADERBOARD_GENERATE).reply((config) => {
+  mock.onPost(API_ROUTES.LEADERBOARD_GENERATE).reply(() => {
     lastLeaderboardGenerateTimestamp = new Date().toISOString();
     return [200, {
       status: 200,

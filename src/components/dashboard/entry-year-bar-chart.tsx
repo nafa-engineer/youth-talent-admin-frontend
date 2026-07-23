@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { customersApi } from '../../lib/api/customers';
+import { CustomerFilterParams } from '../../types/api';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Skeleton } from '../ui/skeleton';
 
@@ -23,7 +24,7 @@ export function EntryYearBarChart({ campusId }: EntryYearBarChartProps) {
         const years = Array.from({ length: 5 }, (_, i) => currentYear - 4 + i);
         
         const countPromises = years.map(async (year) => {
-          const params: Record<string, any> = { entryYear: year };
+          const params: CustomerFilterParams = { entryYear: year };
           if (campusId !== null) {
             params.campusId = campusId;
           }

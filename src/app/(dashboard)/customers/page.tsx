@@ -50,6 +50,7 @@ export default function CustomersPage() {
   }, [activeCampusId, hasTeamFilter, genderFilter, educationLevelFilter]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCustomers();
   }, [fetchCustomers]);
 

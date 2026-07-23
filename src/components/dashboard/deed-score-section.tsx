@@ -12,7 +12,7 @@ import { UserIcon, UserCheck } from 'lucide-react';
 interface DeedScoreSectionProps {
   campusId: number | null;
   isSuperAdmin: boolean;
-  weekParams: Record<string, any>;
+  weekParams: Record<string, unknown>;
 }
 
 interface ChartItem {
@@ -20,6 +20,38 @@ interface ChartItem {
   score: number;
   activities: ActivityAverageDto[];
 }
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{ payload: ChartItem }>;
+}
+
+const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-card p-3 border border-border rounded-lg shadow-md text-xs space-y-1.5 min-w-[150px]">
+        <p className="font-semibold text-sm text-foreground">{data.name}</p>
+        <div className="text-primary font-bold text-sm">
+          Rata-rata Skor: {data.score.toFixed(1)}
+        </div>
+        {data.activities && data.activities.length > 0 && (
+          <div className="border-t border-border mt-1 pt-1.5 space-y-1 text-muted-foreground">
+            {data.activities.map((act) => (
+              <div key={act.deedActivityId} className="flex justify-between gap-4">
+                <span>{act.activityName}</span>
+                <span className="font-medium text-foreground">
+                  {act.averageValue.toFixed(1)} {act.unit}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+  return null;
+};
 
 export function DeedScoreSection({ campusId, isSuperAdmin, weekParams }: DeedScoreSectionProps) {
   const [ikhwanScore, setIkhwanScore] = useState<number | null>(null);
@@ -101,33 +133,6 @@ export function DeedScoreSection({ campusId, isSuperAdmin, weekParams }: DeedSco
 
     fetchData();
   }, [campusId, weekParams, showCampusChart]);
-
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload as ChartItem;
-      return (
-        <div className="bg-card p-3 border border-border rounded-lg shadow-md text-xs space-y-1.5 min-w-[150px]">
-          <p className="font-semibold text-sm text-foreground">{data.name}</p>
-          <div className="text-primary font-bold text-sm">
-            Rata-rata Skor: {data.score.toFixed(1)}
-          </div>
-          {data.activities && data.activities.length > 0 && (
-            <div className="border-t border-border mt-1 pt-1.5 space-y-1 text-muted-foreground">
-              {data.activities.map((act) => (
-                <div key={act.deedActivityId} className="flex justify-between gap-4">
-                  <span>{act.activityName}</span>
-                  <span className="font-medium text-foreground">
-                    {act.averageValue.toFixed(1)} {act.unit}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <div className="space-y-6">

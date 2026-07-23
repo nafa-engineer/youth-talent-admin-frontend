@@ -11,7 +11,7 @@ import { UserIcon, UserCheck } from 'lucide-react';
 interface MentoringSummarySectionProps {
   campusId: number | null;
   isSuperAdmin: boolean;
-  weekParams: Record<string, any>;
+  weekParams: Record<string, unknown>;
 }
 
 export function MentoringSummarySection({ campusId, isSuperAdmin, weekParams }: MentoringSummarySectionProps) {

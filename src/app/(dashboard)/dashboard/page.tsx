@@ -283,7 +283,7 @@ export default function DashboardPage() {
       <section className="space-y-6 pt-4 border-t border-border/40">
         <div>
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold tracking-tight text-foreground">4. Skor Ibadah (Mutaba'ah Yaumiyah)</h2>
+            <h2 className="text-xl font-bold tracking-tight text-foreground">4. Skor Ibadah (Mutaba&apos;ah Yaumiyah)</h2>
             <span className="text-[10px] bg-indigo-500/10 text-indigo-500 px-2 py-0.5 rounded-full font-medium">
               Dipengaruhi Filter Pekan
             </span>
