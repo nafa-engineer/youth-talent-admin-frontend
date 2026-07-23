@@ -2,17 +2,18 @@ import { apiClient } from './client';
 import { 
   CustomerDto, 
   PageCustomerDto, 
-  CustomerTransferTeamRequestDto 
+  CustomerTransferTeamRequestDto,
+  CustomerFilterParams
 } from '../../types/api';
 import { API_ROUTES } from '../constants';
 
 export const customersApi = {
-  getCustomers: async (params?: Record<string, unknown>): Promise<PageCustomerDto> => {
+  getCustomers: async (params?: CustomerFilterParams): Promise<PageCustomerDto> => {
     const response = await apiClient.get<PageCustomerDto>(API_ROUTES.CUSTOMERS, { params });
     return response.data;
   },
   
-  getCustomerCount: async (params?: Record<string, unknown>): Promise<number> => {
+  getCustomerCount: async (params?: CustomerFilterParams): Promise<number> => {
     // Expected response based on API docs: { data: count, message: "...", status: 200 }
     // Or if the wrapper is handled by interceptor, it returns `count` directly.
     // Assuming our interceptor returns `response.data` natively, let's verify interceptor logic.

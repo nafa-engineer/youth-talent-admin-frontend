@@ -5,11 +5,8 @@ import { ROUTES } from './lib/constants';
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const isAuthRoute = pathname.startsWith(ROUTES.LOGIN);
-  const hasCookieToken = request.cookies.has('auth_token');
-
   if (pathname.startsWith('/dashboard') || pathname.startsWith('/master') || pathname.startsWith('/teams') || pathname.startsWith('/leaderboard') || pathname.startsWith('/mentoring') || pathname.startsWith('/profile')) {
-    // Rely on client-side protection primarily for now since Zustand uses localStorage
+    // Rely on client-side protection with Zustand store persistence
   }
   
   return NextResponse.next();

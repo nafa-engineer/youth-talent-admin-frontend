@@ -92,6 +92,18 @@ export interface CustomerTransferTeamRequestDto {
   teamId: number;
 }
 
+export interface CustomerFilterParams {
+  campusId?: number;
+  teamId?: number;
+  grade?: number;
+  entryYear?: number;
+  gender?: Gender;
+  educationLevel?: EducationLevel;
+  hasTeam?: boolean;
+  page?: number;
+  size?: number;
+}
+
 // Team DTOs
 export interface TeamDto {
   id: number;

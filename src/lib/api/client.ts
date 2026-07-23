@@ -49,8 +49,9 @@ apiClient.interceptors.response.use(
           // Jangan redirect jika sudah di halaman login (agar login form
           // bisa menampilkan pesan error dari response 401 via toast)
           if (window.location.pathname !== '/login') {
+            console.warn('apiClient interceptor caught 401/403. Redirecting to login. URL:', error.config?.url);
             localStorage.removeItem('auth-storage');
-            window.location.href = '/login?expired=true';
+            window.location.href = '/login?expired=true&from=apiClient';
           }
         }
       }

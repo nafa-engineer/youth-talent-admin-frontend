@@ -440,6 +440,16 @@ export const setupMockApi = () => {
     if (params.gender) {
       filtered = filtered.filter(c => c.gender === params.gender);
     }
+    if (params.hasTeam !== undefined && params.hasTeam !== null && params.hasTeam !== '') {
+      const hasTeamBool = String(params.hasTeam) === 'true';
+      filtered = filtered.filter(c => hasTeamBool ? c.teamId !== null : c.teamId === null);
+    }
+    if (params.educationLevel) {
+      filtered = filtered.filter(c => c.educationLevel === params.educationLevel);
+    }
+    if (params.entryYear) {
+      filtered = filtered.filter(c => c.entryYear === Number(params.entryYear));
+    }
 
     return [200, {
       status: 200,
@@ -455,6 +465,37 @@ export const setupMockApi = () => {
         empty: filtered.length === 0,
         content: filtered
       }
+    }];
+  });
+
+  mock.onGet(API_ROUTES.CUSTOMERS_COUNT).reply((config) => {
+    const params = config.params || {};
+    let filtered = [...mockCustomers];
+
+    if (params.campusId) {
+      filtered = filtered.filter(c => c.campusId === Number(params.campusId));
+    }
+    if (params.teamId) {
+      filtered = filtered.filter(c => c.teamId === Number(params.teamId));
+    }
+    if (params.gender) {
+      filtered = filtered.filter(c => c.gender === params.gender);
+    }
+    if (params.hasTeam !== undefined && params.hasTeam !== null && params.hasTeam !== '') {
+      const hasTeamBool = String(params.hasTeam) === 'true';
+      filtered = filtered.filter(c => hasTeamBool ? c.teamId !== null : c.teamId === null);
+    }
+    if (params.educationLevel) {
+      filtered = filtered.filter(c => c.educationLevel === params.educationLevel);
+    }
+    if (params.entryYear) {
+      filtered = filtered.filter(c => c.entryYear === Number(params.entryYear));
+    }
+
+    return [200, {
+      status: 200,
+      message: "Success",
+      data: filtered.length
     }];
   });
 
