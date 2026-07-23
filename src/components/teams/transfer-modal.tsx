@@ -78,9 +78,9 @@ export function TransferModal({ open, onOpenChange, selectedCustomers, onSuccess
       toast.success(`Berhasil memindahkan ${selectedCustomers.length} peserta!`, { id: toastId })
       onSuccess()
       onOpenChange(false)
-    } catch (error) {
-      console.error("Failed to transfer participants", error)
-      toast.error("Gagal memindahkan peserta. Silakan coba lagi.", { id: toastId })
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.responseMessage || error.response?.data?.message || "Gagal memindahkan peserta. Silakan coba lagi."
+      toast.error(errorMessage, { id: toastId })
     } finally {
       setIsSubmitting(false)
     }

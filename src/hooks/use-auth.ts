@@ -5,6 +5,7 @@ export const useAuth = () => {
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin);
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const login = useAuthStore((state) => state.login);
   const logout = useAuthStore((state) => state.logout);
   const setProfile = useAuthStore((state) => state.setProfile);
@@ -13,6 +14,7 @@ export const useAuth = () => {
     user,
     isAuthenticated,
     isSuperAdmin,
+    hasHydrated,
     login,
     logout,
     setProfile,

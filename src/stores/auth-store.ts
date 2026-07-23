@@ -6,11 +6,13 @@ interface AuthState {
   user: AuthUser | null;
   isAuthenticated: boolean;
   isSuperAdmin: boolean;
+  hasHydrated: boolean;
   
   // Actions
   login: (user: AuthUser) => void;
   logout: () => void;
   setProfile: (data: Partial<AuthUser>) => void;
+  setHasHydrated: (state: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -19,18 +21,29 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       isSuperAdmin: false,
+      hasHydrated: false,
 
-      login: (user: AuthUser) => set({
-        user,
-        isAuthenticated: true,
-        isSuperAdmin: user.type === UserRole.SUPER_ADMIN
-      }),
+      login: (user: AuthUser) => {
+        if (typeof document !== 'undefined' && user.accessToken) {
+          document.cookie = `auth_token=${user.accessToken}; path=/; max-age=86400; SameSite=Lax`;
+        }
+        set({
+          user,
+          isAuthenticated: true,
+          isSuperAdmin: user.type === UserRole.SUPER_ADMIN
+        });
+      },
 
-      logout: () => set({
-        user: null,
-        isAuthenticated: false,
-        isSuperAdmin: false
-      }),
+      logout: () => {
+        if (typeof document !== 'undefined') {
+          document.cookie = 'auth_token=; path=/; max-age=0; SameSite=Lax';
+        }
+        set({
+          user: null,
+          isAuthenticated: false,
+          isSuperAdmin: false
+        });
+      },
 
       setProfile: (data: Partial<AuthUser>) => set((state) => {
         if (!state.user) return state;
@@ -40,11 +53,16 @@ export const useAuthStore = create<AuthState>()(
           user: updatedUser,
           isSuperAdmin: updatedUser.type === UserRole.SUPER_ADMIN
         };
-      })
+      }),
+
+      setHasHydrated: (state: boolean) => set({ hasHydrated: state })
     }),
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

@@ -11,6 +11,7 @@ import {
   BookOpen, 
   Trophy, 
   Users, 
+  UserCheck,
   Building, 
   Shield, 
   ChevronLeft,
@@ -31,6 +32,7 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
 
   const adminNavItems = [
     { name: 'Dashboard', href: ROUTES.DASHBOARD, icon: LayoutDashboard },
+    { name: 'Manajemen Peserta', href: ROUTES.CUSTOMERS, icon: UserCheck },
     { name: 'Rekap Mentoring', href: ROUTES.MENTORING_RECAP, icon: BookOpen },
     { name: 'Leaderboard', href: ROUTES.LEADERBOARD, icon: Trophy },
     { name: 'Manajemen Tim', href: ROUTES.TEAMS, icon: Users },

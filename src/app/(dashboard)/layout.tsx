@@ -12,21 +12,21 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, hasHydrated } = useAuth();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsClient(true);
-    if (!isAuthenticated) {
-      router.replace(ROUTES.LOGIN);
+    if (hasHydrated && !isAuthenticated) {
+      console.log('DashboardLayout redirecting to login. hasHydrated:', hasHydrated, 'isAuthenticated:', isAuthenticated);
+      router.replace(ROUTES.LOGIN + '?from=layout');
     }
-  }, [isAuthenticated, router]);
+  }, [hasHydrated, isAuthenticated, router]);
 
-  // Prevent hydration mismatch by not rendering until client-side auth check
-  if (!isClient) return null;
+  // Prevent hydration mismatch and redirect race condition by waiting until store has hydrated
+  if (!isClient || !hasHydrated) return null;
   
   if (!isAuthenticated) return null;
 

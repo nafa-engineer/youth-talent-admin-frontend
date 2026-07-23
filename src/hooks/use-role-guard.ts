@@ -5,13 +5,16 @@ import { ROUTES } from '../lib/constants';
 
 export const useRoleGuard = (requireSuperAdmin = false) => {
   const router = useRouter();
-  const { isAuthenticated, isSuperAdmin } = useAuth();
+  const { isAuthenticated, isSuperAdmin, hasHydrated } = useAuth();
 
   useEffect(() => {
-    // If not authenticated, the middleware should have caught this.
-    // But just in case, we can also redirect here.
+    // Wait until Zustand store has finished rehydration
+    if (!hasHydrated) return;
+
+    // If not authenticated after hydration
     if (!isAuthenticated) {
-      router.replace(ROUTES.LOGIN);
+      console.log('useRoleGuard redirecting to login. hasHydrated:', hasHydrated, 'isAuthenticated:', isAuthenticated);
+      router.replace(ROUTES.LOGIN + '?from=roleGuard');
       return;
     }
 
@@ -19,9 +22,9 @@ export const useRoleGuard = (requireSuperAdmin = false) => {
     if (requireSuperAdmin && !isSuperAdmin) {
       router.replace(ROUTES.DASHBOARD);
     }
-  }, [isAuthenticated, isSuperAdmin, requireSuperAdmin, router]);
+  }, [hasHydrated, isAuthenticated, isSuperAdmin, requireSuperAdmin, router]);
 
   return {
-    isAuthorized: requireSuperAdmin ? isSuperAdmin : isAuthenticated,
+    isAuthorized: hasHydrated ? (requireSuperAdmin ? isSuperAdmin : isAuthenticated) : false,
   };
 };
