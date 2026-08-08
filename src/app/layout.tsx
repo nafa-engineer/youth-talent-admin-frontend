@@ -5,6 +5,9 @@ import { Toaster } from "../components/ui/sonner";
 export const metadata: Metadata = {
   title: "YouthTalent Admin - Portal Administrasi Kepemudaan",
   description: "Portal administrasi dan monitoring aktivitas pembinaan pemuda YouthTalent.",
+  icons: {
+    icon: '/../yt.jpeg',
+  },
 };
 
 export default function RootLayout({
