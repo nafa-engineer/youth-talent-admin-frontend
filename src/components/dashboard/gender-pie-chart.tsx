@@ -39,8 +39,8 @@ export function GenderPieChart({ campusId }: GenderPieChartProps) {
     fetchData();
   }, [campusId]);
 
-  // Design Tokens PRD §8 - Primary: #2D7A4F, Secondary: #4A9D6F
-  const COLORS = ['#2D7A4F', '#4A9D6F'];
+  // Design Tokens PRD §8
+  const COLORS = ['var(--color-primary)', 'var(--color-secondary)'];
 
   return (
     <Card className="col-span-1 border-primary/10 shadow-sm h-full">

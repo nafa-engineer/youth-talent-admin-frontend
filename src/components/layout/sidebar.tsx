@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 import { useAuth } from '../../hooks/use-auth';
 import { ROUTES } from '../../lib/constants';
 import { cn } from '../../lib/utils';
@@ -62,17 +63,25 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
         <div className="flex h-16 items-center justify-between px-4 border-b">
           {!collapsed && (
             <div className="flex items-center gap-2 overflow-hidden">
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
-                <span className="text-primary-foreground font-bold text-xs">YT</span>
-              </div>
+              <Image 
+                src="/yt.jpeg" 
+                alt="YouthTalent Logo" 
+                width={32} 
+                height={32} 
+                className="rounded-full shrink-0 object-cover border border-primary/20"
+              />
               <span className="font-bold text-primary truncate">YouthTalent</span>
             </div>
           )}
           {collapsed && (
             <div className="w-full flex justify-center">
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-xs">YT</span>
-              </div>
+              <Image 
+                src="/yt.jpeg" 
+                alt="YouthTalent Logo" 
+                width={32} 
+                height={32} 
+                className="rounded-full object-cover border border-primary/20"
+              />
             </div>
           )}
         </div>

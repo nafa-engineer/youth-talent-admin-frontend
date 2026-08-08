@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useAuth } from '../../hooks/use-auth';
 import { authApi } from '../../lib/api/auth';
 import { ROUTES } from '../../lib/constants';
@@ -63,9 +64,13 @@ export function LoginForm() {
     <Card className="w-full shadow-lg border-primary/20">
       <CardHeader className="space-y-1 text-center">
         <div className="flex justify-center mb-4">
-          <div className="h-12 w-12 bg-primary rounded-full flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-xl">YT</span>
-          </div>
+          <Image 
+            src="/yt.jpeg" 
+            alt="YouthTalent Logo" 
+            width={64} 
+            height={64} 
+            className="rounded-full object-cover shadow-sm border border-primary/20"
+          />
         </div>
         <CardTitle className="text-2xl font-bold tracking-tight text-primary">YouthTalent Admin</CardTitle>
         <CardDescription>
