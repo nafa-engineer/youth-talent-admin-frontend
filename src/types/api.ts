@@ -197,3 +197,34 @@ export interface DeedScoreAverageDto {
   totalCustomers: number;
   activities: ActivityAverageDto[];
 }
+
+// Coach DTOs
+export interface TeamSummaryDto {
+  id: number;
+  name: string;
+  campusId?: number;
+  campusName?: string;
+}
+
+export interface CoachDto {
+  id: number;
+  name: string;
+  email: string;
+  gender: Gender;
+  isActive: boolean;
+  isInternal: boolean;
+  teams: TeamSummaryDto[];
+  createdAt: string; // ISO Date string
+}
+
+export interface CoachRequestDto {
+  name: string;
+  email: string;
+  password: string;
+  gender: Gender;
+  isInternal: boolean;
+}
+
+export interface CoachAssignTeamRequestDto {
+  teamId: number;
+}

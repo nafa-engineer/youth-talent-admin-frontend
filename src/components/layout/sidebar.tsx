@@ -14,7 +14,8 @@ import {
   Users, 
   UserCheck,
   Building, 
-  Shield, 
+  Shield,
+  UserCog, 
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
@@ -41,6 +42,7 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
   const masterDataItems = [
     { name: 'Manajemen Kampus', href: ROUTES.CAMPUSES, icon: Building },
     { name: 'Manajemen Admin', href: ROUTES.ADMINS, icon: Shield },
+    { name: 'Manajemen Coach', href: ROUTES.COACHES, icon: UserCog },
   ];
 
   return (
