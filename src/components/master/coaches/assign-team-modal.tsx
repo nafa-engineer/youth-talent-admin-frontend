@@ -48,10 +48,6 @@ export function AssignTeamModal({ open, onOpenChange, coach, onSuccess }: Assign
     fetchTeams()
   }, [open])
 
-  useEffect(() => {
-    if (open) setSelectedTeamId("")
-  }, [open, coach])
-
   const assignedTeamIds = new Set((coach?.teams || []).map((t) => t.id))
   const availableTeams = teams.filter((t) => !assignedTeamIds.has(t.id))
 

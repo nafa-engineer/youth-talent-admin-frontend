@@ -26,7 +26,9 @@ export default function CoachesPage() {
   const [isFormOpen, setIsFormOpen] = useState(false)
 
   const [isAssignOpen, setIsAssignOpen] = useState(false)
-  const [selectedCoachForAssign, setSelectedCoachForAssign] = useState<CoachDto | null>(null)
+  const [selectedCoachIdForAssign, setSelectedCoachIdForAssign] = useState<number | null>(null)
+
+  const selectedCoachForAssign = coaches.find((c) => c.id === selectedCoachIdForAssign) ?? null
 
   const fetchCoaches = useCallback(async () => {
     setIsLoading(true)
@@ -46,20 +48,13 @@ export default function CoachesPage() {
     fetchCoaches()
   }, [fetchCoaches])
 
-  // Keep the assign modal's coach data fresh after assign/unassign
-  useEffect(() => {
-    if (!selectedCoachForAssign) return
-    const updated = coaches.find((c) => c.id === selectedCoachForAssign.id)
-    if (updated) setSelectedCoachForAssign(updated)
-  }, [coaches, selectedCoachForAssign])
-
   const handleCreateNew = () => {
     setIsFormOpen(true)
   }
 
   const handleManageTeams = (coach: CoachDto) => {
-    setSelectedCoachForAssign(coach)
-    setIsAssignOpen(true)
+  setSelectedCoachIdForAssign(coach.id)
+  setIsAssignOpen(true)
   }
 
   const handleToggleActive = async (coach: CoachDto) => {
