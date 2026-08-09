@@ -29,8 +29,8 @@ const coachSchema = z.object({
   name: z.string().min(3, "Nama coach minimal 3 karakter"),
   email: z.string().email("Format email tidak valid"),
   password: z.string().min(6, "Password minimal 6 karakter"),
-  gender: z.enum(["PRIA", "WANITA"], { required_error: "Jenis kelamin harus dipilih" }),
-  isInternal: z.enum(["true", "false"], { required_error: "Status internal harus dipilih" }),
+  gender: z.enum(["PRIA", "WANITA"], { message: "Jenis kelamin harus dipilih" }),
+  isInternal: z.enum(["true", "false"], { message: "Status internal harus dipilih" }),
 })
 
 type CoachFormValues = z.infer<typeof coachSchema>
