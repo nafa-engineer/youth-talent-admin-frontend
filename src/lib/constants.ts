@@ -9,10 +9,16 @@ export const ROUTES = {
   ADMINS: '/master/admins',
   COACHES: '/master/coaches',
   PROFILE: '/profile',
+  COACH_LOGIN: '/coach/login',
+  COACH_DASHBOARD: '/coach',
+  COACH_DEED_SCORE: '/coach/deed-score',
+  COACH_MENTORING: '/coach/mentoring',
+  COACH_PROFILE: '/coach/profile',
 };
 
 export const API_ROUTES = {
   LOGIN: '/api/v1/auth/admin/login',
+  LOGIN_COACH: '/api/v1/auth/coach/login',
   CAMPUSES: '/api/v1/campuses',
   CAMPUS_DETAIL: (id: number | string) => `/api/v1/campuses/${id}`,
   
@@ -53,6 +59,11 @@ export const API_ROUTES = {
   COACH_DEACTIVATE: (id: number | string) => `/api/v1/coaches/${id}/deactivate`,
   COACH_ASSIGN_TEAM: (id: number | string) => `/api/v1/coaches/${id}/assign-team`,
   COACH_UNASSIGN_TEAM: (id: number | string, teamId: number | string) => `/api/v1/coaches/${id}/teams/${teamId}`,
+  COACH_PROFILE_API: '/api/v1/coaches/profile',
+  COACH_TEAMS: '/api/v1/coach/teams',
+  COACH_CUSTOMERS: '/api/v1/coach/customers',
+  COACH_MENTORING_RECAP: '/api/v1/coach/mentoring/recap',
+  COACH_DEED_SCORE_AVERAGE: '/api/v1/coach/deed-score/average',
 };
 
 export const GENDER_OPTIONS = [

@@ -1,6 +1,7 @@
 export enum UserRole {
   ADMIN = 'ADMIN',
   SUPER_ADMIN = 'SUPER_ADMIN',
+  COACH = 'COACH',
 }
 
 export interface AuthUser {
@@ -11,4 +12,8 @@ export interface AuthUser {
   campusName: string | null;
   accessToken: string;
   refreshToken: string;
+  // Coach-only fields
+  gender?: string;
+  isInternal?: boolean;
+  teamIds?: number[];
 }
