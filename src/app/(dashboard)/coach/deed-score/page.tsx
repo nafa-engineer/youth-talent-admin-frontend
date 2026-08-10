@@ -3,13 +3,13 @@
 import React, { useEffect, useState, useCallback } from "react"
 import { useCoachRoleGuard } from "../../../../hooks/use-role-guard"
 import { coachDataApi } from "../../../../lib/api/coach-data"
-import { DeedScoreAverageDto } from "../../../../types/api"
+import { CoachDeedScoreAverageDto } from "../../../../types/api"
 import { DataTable, ColumnDef } from "../../../../components/shared/data-table"
 import { toast } from "sonner"
 
 export default function CoachDeedScorePage() {
   const { isAuthorized } = useCoachRoleGuard()
-  const [data, setData] = useState<DeedScoreAverageDto[]>([])
+  const [data, setData] = useState<CoachDeedScoreAverageDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   const fetchData = useCallback(async () => {
@@ -32,7 +32,7 @@ export default function CoachDeedScorePage() {
   }, [isAuthorized, fetchData])
   if (!isAuthorized) return null
 
-  const columns: ColumnDef<DeedScoreAverageDto>[] = [
+  const columns: ColumnDef<CoachDeedScoreAverageDto>[] = [
     { header: "Minggu", render: (row) => <span className="text-sm">{row.weekLabel}</span> },
     { header: "Tim", render: (row) => <span className="font-medium">{row.teamName}</span> },
     {
