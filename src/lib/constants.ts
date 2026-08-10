@@ -7,6 +7,7 @@ export const ROUTES = {
   TEAMS: '/teams',
   CAMPUSES: '/master/campuses',
   ADMINS: '/master/admins',
+  COACHES: '/master/coaches',
   PROFILE: '/profile',
 };
 
@@ -45,6 +46,13 @@ export const API_ROUTES = {
   MENTORING_RECAP_SUMMARY: '/api/v1/mentoring/recap/summary',
   
   DEED_SCORE_AVERAGE: '/api/v1/deed-score/average',
+
+  COACHES: '/api/v1/coaches',
+  COACH_DETAIL: (id: number | string) => `/api/v1/coaches/${id}`,
+  COACH_ACTIVATE: (id: number | string) => `/api/v1/coaches/${id}/activate`,
+  COACH_DEACTIVATE: (id: number | string) => `/api/v1/coaches/${id}/deactivate`,
+  COACH_ASSIGN_TEAM: (id: number | string) => `/api/v1/coaches/${id}/assign-team`,
+  COACH_UNASSIGN_TEAM: (id: number | string, teamId: number | string) => `/api/v1/coaches/${id}/teams/${teamId}`,
 };
 
 export const GENDER_OPTIONS = [
