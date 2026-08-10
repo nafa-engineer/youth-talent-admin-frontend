@@ -3,13 +3,13 @@
 import React, { useEffect, useState, useCallback } from "react"
 import { useCoachRoleGuard } from "../../../../hooks/use-role-guard"
 import { coachDataApi } from "../../../../lib/api/coach-data"
-import { MentoringAttendanceRecapDto } from "../../../../types/api"
+import { CoachMentoringRecapDto } from "../../../../types/api"
 import { DataTable, ColumnDef } from "../../../../components/shared/data-table"
 import { toast } from "sonner"
 
 export default function CoachMentoringPage() {
   const { isAuthorized } = useCoachRoleGuard()
-  const [data, setData] = useState<MentoringAttendanceRecapDto[]>([])
+  const [data, setData] = useState<CoachMentoringRecapDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   const fetchData = useCallback(async () => {
@@ -33,7 +33,7 @@ export default function CoachMentoringPage() {
 
   if (!isAuthorized) return null
 
-  const columns: ColumnDef<MentoringAttendanceRecapDto>[] = [
+  const columns: ColumnDef<CoachMentoringRecapDto>[] = [
     { header: "Minggu", render: (row) => <span className="text-sm">{row.weekLabel}</span> },
     { header: "Tim", render: (row) => <span className="font-medium">{row.teamName}</span> },
     {
