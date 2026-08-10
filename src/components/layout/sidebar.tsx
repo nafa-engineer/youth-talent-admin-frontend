@@ -56,6 +56,7 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
 
   return (
     <>
+      {/* Mobile Sidebar Backdrop */}
       {mobileOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-30 md:hidden transition-opacity duration-300"
@@ -125,6 +126,7 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
                     <item.icon className={cn("h-5 w-5 shrink-0", isActive ? "text-primary" : "text-muted-foreground group-hover:text-sidebar-accent-foreground")} />
                     {!collapsed && <span>{item.name}</span>}
 
+                    {/* Tooltip for collapsed state */}
                     {collapsed && (
                       <div className="absolute left-14 hidden group-hover:block bg-popover text-popover-foreground text-xs px-2 py-1 rounded shadow-md whitespace-nowrap z-50">
                         {item.name}

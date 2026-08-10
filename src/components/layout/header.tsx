@@ -35,6 +35,8 @@ export function Header({ onMenuClick }: HeaderProps) {
 
   const handleLogout = () => {
     logout();
+    // Redirect handled by middleware or guarded hooks typically,
+    // but explicit window location ensures a clean state 
     window.location.href = isCoach ? ROUTES.COACH_LOGIN : ROUTES.LOGIN;
   };
 
@@ -45,6 +47,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   return (
     <header className="h-16 border-b bg-card flex items-center justify-between px-4 lg:px-8 shadow-sm">
       <div className="flex items-center gap-4">
+        {/* Mobile menu trigger could be here */}
         <Button variant="ghost" size="icon" className="md:hidden" onClick={onMenuClick}>
           <Menu className="h-5 w-5" />
         </Button>

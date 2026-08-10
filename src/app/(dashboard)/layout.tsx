@@ -24,6 +24,7 @@ export default function DashboardLayout({
     }
   }, [hasHydrated, isAuthenticated, isCoach, router]);
 
+  // Prevent hydration mismatch and redirect race condition by waiting until store has hydrated
   if (!isClient || !hasHydrated) return null;
   if (!isAuthenticated) return null;
 

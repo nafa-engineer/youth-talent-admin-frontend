@@ -8,8 +8,10 @@ export const useRoleGuard = (requireSuperAdmin = false) => {
   const { isAuthenticated, isSuperAdmin, isCoach, hasHydrated } = useAuth();
 
   useEffect(() => {
+    // Wait until Zustand store has finished rehydration
     if (!hasHydrated) return;
 
+    // If not authenticated after hydration
     if (!isAuthenticated) {
       router.replace(ROUTES.LOGIN + '?from=roleGuard');
       return;
@@ -21,6 +23,7 @@ export const useRoleGuard = (requireSuperAdmin = false) => {
       return;
     }
 
+    // If super admin is required but user is not super admin
     if (requireSuperAdmin && !isSuperAdmin) {
       router.replace(ROUTES.DASHBOARD);
     }
