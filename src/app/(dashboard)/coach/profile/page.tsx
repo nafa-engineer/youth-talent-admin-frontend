@@ -28,6 +28,7 @@ export default function CoachProfilePage() {
 
   useEffect(() => {
     if (!isAuthorized) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProfile()
   }, [isAuthorized, fetchProfile])
 

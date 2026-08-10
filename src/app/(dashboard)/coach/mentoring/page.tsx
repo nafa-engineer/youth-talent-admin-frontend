@@ -27,6 +27,7 @@ export default function CoachMentoringPage() {
 
   useEffect(() => {
     if (!isAuthorized) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData()
   }, [isAuthorized, fetchData])
 

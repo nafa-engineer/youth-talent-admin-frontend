@@ -27,9 +27,9 @@ export default function CoachDeedScorePage() {
 
   useEffect(() => {
     if (!isAuthorized) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData()
   }, [isAuthorized, fetchData])
-
   if (!isAuthorized) return null
 
   const columns: ColumnDef<DeedScoreAverageDto>[] = [
