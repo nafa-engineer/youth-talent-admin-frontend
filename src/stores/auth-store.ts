@@ -6,6 +6,7 @@ interface AuthState {
   user: AuthUser | null;
   isAuthenticated: boolean;
   isSuperAdmin: boolean;
+  isCoach: boolean;
   hasHydrated: boolean;
   
   // Actions
@@ -21,6 +22,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       isSuperAdmin: false,
+      isCoach: false,
       hasHydrated: false,
 
       login: (user: AuthUser) => {
@@ -30,7 +32,8 @@ export const useAuthStore = create<AuthState>()(
         set({
           user,
           isAuthenticated: true,
-          isSuperAdmin: user.type === UserRole.SUPER_ADMIN
+          isSuperAdmin: user.type === UserRole.SUPER_ADMIN,
+          isCoach: user.type === UserRole.COACH,
         });
       },
 
@@ -41,7 +44,8 @@ export const useAuthStore = create<AuthState>()(
         set({
           user: null,
           isAuthenticated: false,
-          isSuperAdmin: false
+          isSuperAdmin: false,
+          isCoach: false,
         });
       },
 
@@ -51,7 +55,8 @@ export const useAuthStore = create<AuthState>()(
         const updatedUser = { ...state.user, ...data };
         return {
           user: updatedUser,
-          isSuperAdmin: updatedUser.type === UserRole.SUPER_ADMIN
+          isSuperAdmin: updatedUser.type === UserRole.SUPER_ADMIN,
+          isCoach: updatedUser.type === UserRole.COACH,
         };
       }),
 

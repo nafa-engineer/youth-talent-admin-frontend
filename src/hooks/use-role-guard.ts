@@ -5,26 +5,51 @@ import { ROUTES } from '../lib/constants';
 
 export const useRoleGuard = (requireSuperAdmin = false) => {
   const router = useRouter();
-  const { isAuthenticated, isSuperAdmin, hasHydrated } = useAuth();
+  const { isAuthenticated, isSuperAdmin, isCoach, hasHydrated } = useAuth();
 
   useEffect(() => {
-    // Wait until Zustand store has finished rehydration
     if (!hasHydrated) return;
 
-    // If not authenticated after hydration
     if (!isAuthenticated) {
-      console.log('useRoleGuard redirecting to login. hasHydrated:', hasHydrated, 'isAuthenticated:', isAuthenticated);
       router.replace(ROUTES.LOGIN + '?from=roleGuard');
       return;
     }
 
-    // If super admin is required but user is not super admin
+    // Coach tidak boleh akses halaman admin sama sekali
+    if (isCoach) {
+      router.replace(ROUTES.COACH_DASHBOARD);
+      return;
+    }
+
     if (requireSuperAdmin && !isSuperAdmin) {
       router.replace(ROUTES.DASHBOARD);
     }
-  }, [hasHydrated, isAuthenticated, isSuperAdmin, requireSuperAdmin, router]);
+  }, [hasHydrated, isAuthenticated, isSuperAdmin, isCoach, requireSuperAdmin, router]);
 
   return {
-    isAuthorized: hasHydrated ? (requireSuperAdmin ? isSuperAdmin : isAuthenticated) : false,
+    isAuthorized: hasHydrated ? (requireSuperAdmin ? isSuperAdmin : isAuthenticated && !isCoach) : false,
+  };
+};
+
+// Guard khusus untuk halaman coach
+export const useCoachRoleGuard = () => {
+  const router = useRouter();
+  const { isAuthenticated, isCoach, hasHydrated } = useAuth();
+
+  useEffect(() => {
+    if (!hasHydrated) return;
+
+    if (!isAuthenticated) {
+      router.replace(ROUTES.COACH_LOGIN + '?from=coachRoleGuard');
+      return;
+    }
+
+    if (!isCoach) {
+      router.replace(ROUTES.DASHBOARD);
+    }
+  }, [hasHydrated, isAuthenticated, isCoach, router]);
+
+  return {
+    isAuthorized: hasHydrated ? isCoach : false,
   };
 };

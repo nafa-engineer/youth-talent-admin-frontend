@@ -9,10 +9,13 @@ export const ROUTES = {
   ADMINS: '/master/admins',
   COACHES: '/master/coaches',
   PROFILE: '/profile',
+  COACH_LOGIN: '/coach/login',
+  COACH_DASHBOARD: '/coach/dashboard',
 };
 
 export const API_ROUTES = {
   LOGIN: '/api/v1/auth/admin/login',
+  LOGIN_COACH: '/api/v1/auth/coach/login',
   CAMPUSES: '/api/v1/campuses',
   CAMPUS_DETAIL: (id: number | string) => `/api/v1/campuses/${id}`,
   

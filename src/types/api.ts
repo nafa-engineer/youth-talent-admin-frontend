@@ -228,3 +228,13 @@ export interface CoachRequestDto {
 export interface CoachAssignTeamRequestDto {
   teamId: number;
 }
+
+export interface CoachLoginResponseDto {
+  email: string;
+  name: string;
+  gender: string;
+  isInternal: boolean;
+  teamIds: number[];
+  accessToken: string;
+  refreshToken: string;
+}
