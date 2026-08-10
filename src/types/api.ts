@@ -238,3 +238,19 @@ export interface CoachLoginResponseDto {
   accessToken: string;
   refreshToken: string;
 }
+
+export interface CoachMentoringRecapDto {
+  weekId: number;
+  weekLabel: string;
+  teamId: number;
+  teamName: string;
+  totalCustomers: number;
+  totalAttendance: number;
+}
+export interface CoachDeedScoreAverageDto {
+  weekId: number;
+  weekLabel: string;
+  teamId: number;
+  teamName: string;
+  averageScore: number; // 0.0–1.0, kalikan 100 untuk tampilan poin
+}
