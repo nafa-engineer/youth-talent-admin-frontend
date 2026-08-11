@@ -1,0 +1,50 @@
+name: CD - Development
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  deploy-development:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: ${{ secrets.DEV_API_BASE_URL }}
+        run: npm run build
+
+      - name: Setup SSH key
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+
+      - name: Deploy build ke server
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i /tmp/deploy_key -o StrictHostKeyChecking=no -p 2222" \
+            .next package.json package-lock.json public next.config.ts \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/root/admin-frontend-dev/
+
+      - name: Install production dependencies & restart
+        run: |
+          ssh -i /tmp/deploy_key -o StrictHostKeyChecking=no -p 2222 \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            cd /root/admin-frontend-dev
+            npm ci --omit=dev
+            pm2 restart admin-frontend-dev || pm2 start npm --name admin-frontend-dev -- start -- -p 3002
+            pm2 save
+          EOF
