@@ -1,5 +1,7 @@
 export const ROUTES = {
   LOGIN: '/login',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
   DASHBOARD: '/dashboard',
   CUSTOMERS: '/customers',
   MENTORING_RECAP: '/mentoring/recap',
@@ -10,6 +12,8 @@ export const ROUTES = {
   COACHES: '/master/coaches',
   PROFILE: '/profile',
   COACH_LOGIN: '/coach/login',
+  COACH_FORGOT_PASSWORD: '/coach/forgot-password',
+  COACH_RESET_PASSWORD: '/coach/reset-password',
   COACH_DASHBOARD: '/coach',
   COACH_DEED_SCORE: '/coach/deed-score',
   COACH_MENTORING: '/coach/mentoring',
@@ -19,6 +23,10 @@ export const ROUTES = {
 export const API_ROUTES = {
   LOGIN: '/api/v1/auth/admin/login',
   LOGIN_COACH: '/api/v1/auth/coach/login',
+  FORGOT_PASSWORD_ADMIN: '/api/v1/auth/admin/forgot-password',
+  RESET_PASSWORD_ADMIN: '/api/v1/auth/admin/reset-password',
+  FORGOT_PASSWORD_COACH: '/api/v1/auth/coach/forgot-password',
+  RESET_PASSWORD_COACH: '/api/v1/auth/coach/reset-password',
   CAMPUSES: '/api/v1/campuses',
   CAMPUS_DETAIL: (id: number | string) => `/api/v1/campuses/${id}`,
   
