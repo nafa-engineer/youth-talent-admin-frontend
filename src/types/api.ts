@@ -246,7 +246,9 @@ export interface CoachMentoringRecapDto {
   teamName: string;
   totalCustomers: number;
   totalAttendance: number;
+  attendancePercentage: number;
 }
+
 export interface CoachDeedScoreAverageDto {
   weekId: number;
   weekLabel: string;
