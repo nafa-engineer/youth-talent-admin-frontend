@@ -83,6 +83,7 @@ export default function CoachesPage() {
     return (
       c.name.toLowerCase().includes(query) ||
       c.email.toLowerCase().includes(query) ||
+      (c.phoneNumber || "").toLowerCase().includes(query) ||
       c.teams.some((t) => t.name.toLowerCase().includes(query))
     )
   })
@@ -95,6 +96,12 @@ export default function CoachesPage() {
           <span className="font-semibold text-foreground">{row.name}</span>
           <span className="text-xs text-muted-foreground">{row.email}</span>
         </div>
+      ),
+    },
+    {
+      header: "Nomor HP",
+      render: (row) => (
+        <span className="text-sm">{row.phoneNumber ? row.phoneNumber : "-"}</span>
       ),
     },
     {
@@ -198,7 +205,7 @@ export default function CoachesPage() {
           <div className="relative">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Cari berdasarkan nama, email, atau tim..."
+              placeholder="Cari berdasarkan nama, email, nomor HP, atau tim..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 h-9"

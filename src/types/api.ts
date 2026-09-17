@@ -213,6 +213,7 @@ export interface CoachDto {
   gender: Gender;
   isActive: boolean;
   isInternal: boolean;
+  phoneNumber?: string;
   teams: TeamSummaryDto[];
   createdAt: string; // ISO Date string
 }
@@ -221,6 +222,7 @@ export interface CoachRequestDto {
   name: string;
   email: string;
   password: string;
+  phoneNumber: string;
   gender: Gender;
   isInternal: boolean;
 }
@@ -247,12 +249,4 @@ export interface CoachMentoringRecapDto {
   totalCustomers: number;
   totalAttendance: number;
   attendancePercentage: number;
-}
-
-export interface CoachDeedScoreAverageDto {
-  weekId: number;
-  weekLabel: string;
-  teamId: number;
-  teamName: string;
-  averageScore: number; // 0.0–1.0, kalikan 100 untuk tampilan poin
 }
