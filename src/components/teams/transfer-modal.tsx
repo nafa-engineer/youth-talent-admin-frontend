@@ -126,7 +126,11 @@ export function TransferModal({ open, onOpenChange, selectedCustomers, onSuccess
           {/* Target Team Select */}
           <div className="space-y-1.5">
             <Label htmlFor="targetTeam">Tim / Halaqah Tujuan</Label>
-            <Select value={selectedTeamId} onValueChange={(val) => setSelectedTeamId(val || "")}>
+            <Select
+              value={selectedTeamId}
+              onValueChange={(val) => setSelectedTeamId(val || "")}
+              items={Object.fromEntries(teams.map((t) => [String(t.id), `${t.name} (${t.campusName})`]))}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={isLoadingTeams ? "Memuat tim..." : "Pilih Tim Tujuan"} />
               </SelectTrigger>

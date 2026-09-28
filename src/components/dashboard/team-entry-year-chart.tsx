@@ -99,6 +99,7 @@ export function TeamEntryYearChart({ campusId }: TeamEntryYearChartProps) {
             <Select 
               value={String(selectedTeamId)} 
               onValueChange={(val) => setSelectedTeamId(Number(val))}
+              items={Object.fromEntries(teams.map((team) => [String(team.id), team.name]))}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Pilih Kelompok" />

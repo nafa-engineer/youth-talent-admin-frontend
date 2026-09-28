@@ -57,7 +57,7 @@ export function CampusFilter({ value, onChange, className }: CampusFilterProps) 
   // For Admin, just show a disabled select with their campus name
   if (!isSuperAdmin) {
     return (
-      <Select disabled value={String(campusId)}>
+      <Select disabled value={String(campusId)} items={campusId ? { [String(campusId)]: user?.campusName || 'Kampus Anda' } : {}}>
         <SelectTrigger className={className}>
           <SelectValue placeholder={user?.campusName || 'Kampus Anda'} />
         </SelectTrigger>
@@ -71,6 +71,10 @@ export function CampusFilter({ value, onChange, className }: CampusFilterProps) 
       value={value === null ? "ALL" : String(value)} 
       onValueChange={(val) => onChange(val === "ALL" ? null : Number(val))}
       disabled={isLoading}
+      items={{
+        ALL: 'Semua Kampus',
+        ...Object.fromEntries(campuses.map((campus) => [String(campus.id), campus.name])),
+      }}
     >
       <SelectTrigger className={className}>
         <SelectValue placeholder={isLoading ? "Memuat..." : "Pilih Kampus"} />

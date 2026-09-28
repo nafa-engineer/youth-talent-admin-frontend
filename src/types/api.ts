@@ -25,6 +25,7 @@ export interface DeedLeaderboardItemDto {
   teamName: string;
   campusName: string;
   score: number;
+  gender?: Gender | null;
 }
 
 export interface DeedLeaderboardResponseDto {
@@ -87,6 +88,18 @@ export interface PageCustomerDto {
   content: CustomerDto[];
 }
 
+export interface PageResponse<T> {
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  numberOfElements: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+  content: T[];
+}
+
 export interface CustomerTransferTeamRequestDto {
   customerId: number;
   teamId: number;
@@ -100,6 +113,8 @@ export interface CustomerFilterParams {
   gender?: Gender;
   educationLevel?: EducationLevel;
   hasTeam?: boolean;
+  search?: string;
+  searchBy?: 'ALL' | 'NAME' | 'EMAIL' | 'PHONE';
   page?: number;
   size?: number;
 }
@@ -179,6 +194,8 @@ export interface MentoringAttendanceSummaryDto {
   gender: Gender | null;
   totalCustomers: number;
   averageAttendancePercentage: number;
+  passingCount?: number;
+  attentionCount?: number;
 }
 
 // Deed Score Average DTOs

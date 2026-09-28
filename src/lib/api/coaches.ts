@@ -1,10 +1,17 @@
 import { apiClient } from './client';
-import { CoachDto, CoachRequestDto, CoachAssignTeamRequestDto } from '../../types/api';
+import { CoachDto, CoachRequestDto, CoachAssignTeamRequestDto, PageResponse } from '../../types/api';
 import { API_ROUTES } from '../constants';
 
+export interface CoachListParams {
+  search?: string;
+  searchBy?: 'ALL' | 'NAME' | 'EMAIL' | 'PHONE' | 'TEAM';
+  page?: number;
+  size?: number;
+}
+
 export const coachesApi = {
-  getCoaches: async (): Promise<CoachDto[]> => {
-    const response = await apiClient.get<CoachDto[]>(API_ROUTES.COACHES);
+  getCoaches: async (params?: CoachListParams): Promise<PageResponse<CoachDto>> => {
+    const response = await apiClient.get<PageResponse<CoachDto>>(API_ROUTES.COACHES, { params });
     return response.data;
   },
 

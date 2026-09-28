@@ -122,7 +122,11 @@ export function AssignTeamModal({ open, onOpenChange, coach, onSuccess }: Assign
           <div className="space-y-1">
             <Label htmlFor="teamId">Tambah Tim</Label>
             <div className="flex gap-2">
-              <Select value={selectedTeamId} onValueChange={(val) => setSelectedTeamId(val ?? "")}>
+              <Select
+                value={selectedTeamId}
+                onValueChange={(val) => setSelectedTeamId(val ?? "")}
+                items={Object.fromEntries(availableTeams.map((t) => [String(t.id), t.name]))}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={isLoadingTeams ? "Memuat..." : "Pilih Tim"} />
                 </SelectTrigger>

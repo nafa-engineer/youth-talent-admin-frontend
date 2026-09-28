@@ -13,6 +13,7 @@ import { UserRole } from '../../types/auth';
 
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { PasswordInput } from '../ui/password-input';
 import { Label } from '../ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { toast } from 'sonner';
@@ -95,9 +96,8 @@ export function CoachLoginForm() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Kata Sandi</Label>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               {...register('password')}
               disabled={isLoading}
               placeholder="*********"

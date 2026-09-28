@@ -3,7 +3,7 @@ import { TeamDto, TeamRequestDto } from '../../types/api';
 import { API_ROUTES } from '../constants';
 
 export const teamsApi = {
-  getTeams: async (params?: { campusId?: number | string }): Promise<TeamDto[]> => {
+  getTeams: async (params?: { campusId?: number | string; search?: string }): Promise<TeamDto[]> => {
     const response = await apiClient.get<TeamDto[]>(API_ROUTES.TEAMS, { params });
     return response.data;
   },

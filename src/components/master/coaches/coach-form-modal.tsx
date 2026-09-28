@@ -93,8 +93,8 @@ export function CoachFormModal({ open, onOpenChange, onSuccess }: CoachFormModal
     }
     const t = setTimeout(async () => {
       try {
-        const coaches = await coachesApi.getCoaches()
-        const matches = coaches.filter((c) => {
+        const result = await coachesApi.getCoaches({ size: 1000 })
+        const matches = (result.content || []).filter((c) => {
           const em = (c.email || "").toLowerCase()
           const ph = (c.phoneNumber || "").toLowerCase()
           const q = query.toLowerCase()
@@ -191,6 +191,7 @@ export function CoachFormModal({ open, onOpenChange, onSuccess }: CoachFormModal
             <Select
               value={genderValue || ""}
               onValueChange={(val) => setValue("gender", val as "PRIA" | "WANITA", { shouldValidate: true })}
+              items={Object.fromEntries(GENDER_OPTIONS.map((g) => [g.value, g.label]))}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Pilih Jenis Kelamin" />
@@ -211,6 +212,7 @@ export function CoachFormModal({ open, onOpenChange, onSuccess }: CoachFormModal
             <Select
               value={isInternalValue || ""}
               onValueChange={(val) => setValue("isInternal", val as "true" | "false", { shouldValidate: true })}
+              items={{ "true": "Internal", "false": "Eksternal" }}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Pilih Status" />
