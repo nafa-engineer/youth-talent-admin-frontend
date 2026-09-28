@@ -18,6 +18,8 @@ import { Button } from '../ui/button';
 interface CustomerFiltersProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  searchBy: 'ALL' | 'NAME' | 'EMAIL' | 'PHONE';
+  onSearchByChange: (value: 'ALL' | 'NAME' | 'EMAIL' | 'PHONE') => void;
   selectedCampusId: number | null;
   onCampusChange: (campusId: number | null) => void;
   hasTeamFilter: boolean | null;
@@ -32,6 +34,8 @@ interface CustomerFiltersProps {
 export function CustomerFilters({
   searchQuery,
   onSearchChange,
+  searchBy,
+  onSearchByChange,
   selectedCampusId,
   onCampusChange,
   hasTeamFilter,
@@ -48,13 +52,41 @@ export function CustomerFilters({
     genderFilter !== null ||
     educationLevelFilter !== null;
 
+  const hasTeamItems = {
+    ALL: 'Semua Status Tim',
+    HAS_TEAM: 'Sudah Punya Tim',
+    NO_TEAM: 'Belum Punya Tim',
+  };
+  const genderItems = {
+    ALL: 'Semua Gender',
+    ...Object.fromEntries(GENDER_OPTIONS.map((g) => [g.value, g.label])),
+  };
+  const educationItems = {
+    ALL: 'Semua Jenjang',
+    ...Object.fromEntries(EDUCATION_LEVEL_OPTIONS.map((e) => [e.value, e.label])),
+  };
+  const searchByItems = {
+    ALL: 'Semua Kolom',
+    NAME: 'Nama',
+    EMAIL: 'Email',
+    PHONE: 'No. HP',
+  };
+  const searchPlaceholder =
+    searchBy === 'NAME'
+      ? 'Cari nama peserta...'
+      : searchBy === 'EMAIL'
+        ? 'Cari email peserta...'
+        : searchBy === 'PHONE'
+          ? 'Cari nomor HP peserta...'
+          : 'Cari nama, email, atau no. HP...';
+
   return (
     <div className="flex flex-col md:flex-row flex-wrap items-center gap-3 bg-card p-4 rounded-lg border">
       {/* Search Input */}
       <div className="relative flex-1 min-w-[220px] w-full">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Cari nama atau email peserta..."
+          placeholder={searchPlaceholder}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           className="pl-9"
@@ -67,6 +99,25 @@ export function CustomerFilters({
             <X className="h-4 w-4" />
           </button>
         )}
+      </div>
+
+      {/* Search By */}
+      <div className="w-full md:w-[150px]">
+        <Select
+          value={searchBy}
+          onValueChange={(val) => onSearchByChange(val as 'ALL' | 'NAME' | 'EMAIL' | 'PHONE')}
+          items={searchByItems}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Cari Berdasarkan" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">Semua Kolom</SelectItem>
+            <SelectItem value="NAME">Nama</SelectItem>
+            <SelectItem value="EMAIL">Email</SelectItem>
+            <SelectItem value="PHONE">No. HP</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Campus Filter */}
@@ -87,6 +138,7 @@ export function CustomerFilters({
             else if (val === 'HAS_TEAM') onHasTeamChange(true);
             else if (val === 'NO_TEAM') onHasTeamChange(false);
           }}
+          items={hasTeamItems}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Status Tim" />
@@ -104,6 +156,7 @@ export function CustomerFilters({
         <Select
           value={genderFilter === null ? 'ALL' : genderFilter}
           onValueChange={(val) => onGenderChange(val === 'ALL' ? null : (val as Gender))}
+          items={genderItems}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Gender" />
@@ -124,6 +177,7 @@ export function CustomerFilters({
         <Select
           value={educationLevelFilter === null ? 'ALL' : educationLevelFilter}
           onValueChange={(val) => onEducationLevelChange(val === 'ALL' ? null : (val as EducationLevel))}
+          items={educationItems}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Pendidikan" />

@@ -9,7 +9,7 @@ import Image from 'next/image';
 import { authApi } from '../../lib/api/auth';
 import { ROUTES } from '../../lib/constants';
 import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+import { PasswordInput } from '../ui/password-input';
 import { Label } from '../ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { toast } from 'sonner';
@@ -78,9 +78,8 @@ export function ResetPasswordForm({ token, isCoach = false }: ResetPasswordFormP
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="newPassword">Kata Sandi Baru</Label>
-            <Input
+            <PasswordInput
               id="newPassword"
-              type="password"
               placeholder="*********"
               {...register('newPassword')}
               disabled={isLoading}
@@ -89,9 +88,8 @@ export function ResetPasswordForm({ token, isCoach = false }: ResetPasswordFormP
           </div>
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Konfirmasi Kata Sandi</Label>
-            <Input
+            <PasswordInput
               id="confirmPassword"
-              type="password"
               placeholder="*********"
               {...register('confirmPassword')}
               disabled={isLoading}

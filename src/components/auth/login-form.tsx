@@ -14,6 +14,7 @@ import { UserRole } from '../../types/auth';
 
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { PasswordInput } from '../ui/password-input';
 import { Label } from '../ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { toast } from 'sonner';
@@ -98,9 +99,8 @@ export function LoginForm() {
                 Lupa kata sandi?
               </Link>
             </div>
-            <Input 
+            <PasswordInput 
               id="password" 
-              type="password"
               {...register('password')}
               disabled={isLoading}
               placeholder='*********'

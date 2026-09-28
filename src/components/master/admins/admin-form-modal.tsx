@@ -173,6 +173,7 @@ export function AdminFormModal({ open, onOpenChange, onSuccess }: AdminFormModal
             <Select
               value={campusIdValue ? String(campusIdValue) : ""}
               onValueChange={(val) => setValue("campusId", Number(val), { shouldValidate: true })}
+              items={Object.fromEntries(campuses.map((c) => [String(c.id), c.name]))}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={isLoadingCampuses ? "Memuat..." : "Pilih Kampus"} />

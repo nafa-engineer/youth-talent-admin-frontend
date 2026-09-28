@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import { MentoringAttendanceRecapDto, MentoringAttendanceSummaryDto } from '../../types/api';
+import { MentoringAttendanceRecapDto, MentoringAttendanceSummaryDto, PageResponse } from '../../types/api';
 import { API_ROUTES } from '../constants';
 
 export interface MentoringRecapParams {
@@ -9,11 +9,13 @@ export interface MentoringRecapParams {
   weekIds?: number[];
   startDate?: string;
   endDate?: string;
+  page?: number;
+  size?: number;
 }
 
 export const mentoringApi = {
-  getMentoringRecap: async (params?: MentoringRecapParams): Promise<MentoringAttendanceRecapDto[]> => {
-    const response = await apiClient.get<MentoringAttendanceRecapDto[]>(API_ROUTES.MENTORING_RECAP, { params });
+  getMentoringRecap: async (params?: MentoringRecapParams): Promise<PageResponse<MentoringAttendanceRecapDto>> => {
+    const response = await apiClient.get<PageResponse<MentoringAttendanceRecapDto>>(API_ROUTES.MENTORING_RECAP, { params });
     return response.data;
   },
 

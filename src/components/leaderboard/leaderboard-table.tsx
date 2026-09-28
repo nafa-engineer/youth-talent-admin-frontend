@@ -3,6 +3,7 @@
 import * as React from "react"
 import { DataTable, ColumnDef } from "../shared/data-table"
 import { DeedLeaderboardItemDto } from "../../types/api"
+import { Badge } from "../ui/badge"
 import { Trophy } from "lucide-react"
 
 interface LeaderboardTableProps {
@@ -62,16 +63,36 @@ export function LeaderboardTable({ data, isLoading = false }: LeaderboardTablePr
       accessorKey: "teamName",
     },
     {
+      header: "Gender",
+      className: "w-[110px]",
+      render: (row) => {
+        if (!row.gender) return <span className="text-muted-foreground">-</span>
+        const isMale = row.gender === "PRIA"
+        return (
+          <Badge
+            variant="outline"
+            className={
+              isMale
+                ? "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300"
+                : "border-pink-200 bg-pink-50 text-pink-700 dark:border-pink-800 dark:bg-pink-950 dark:text-pink-300"
+            }
+          >
+            {isMale ? "Ikhwan" : "Akhwat"}
+          </Badge>
+        )
+      },
+    },
+    {
       header: "Kampus",
       accessorKey: "campusName",
     },
     {
-      header: "Skor Total / Frekuensi",
-      className: "w-[180px] text-right font-extrabold text-foreground pr-6",
+      header: "Skor (0-100)",
+      className: "w-[160px] text-right font-extrabold text-foreground pr-6",
       render: (row) => {
         return (
           <span className="text-primary text-base">
-            {row.score.toLocaleString()}
+            {(row.score * 100).toFixed(1)}
           </span>
         )
       },

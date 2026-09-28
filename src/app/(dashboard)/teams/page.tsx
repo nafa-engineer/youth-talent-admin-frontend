@@ -20,6 +20,7 @@ export default function TeamsPage() {
   // Filter States
   const [selectedCampus, setSelectedCampus] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
 
   // Data States
   const [teams, setTeams] = useState<TeamDto[]>([])
@@ -29,11 +30,20 @@ export default function TeamsPage() {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false)
   const [selectedTeamForEdit, setSelectedTeamForEdit] = useState<TeamDto | null>(null)
 
+  // Debounce search (server-side search)
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 400)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
   const fetchTeams = useCallback(async () => {
     setIsLoading(true)
     try {
       const campusId = !isSuperAdmin ? myCampusId : selectedCampus
-      const data = await teamsApi.getTeams(campusId ? { campusId } : undefined)
+      const params: { campusId?: number; search?: string } = {}
+      if (campusId) params.campusId = campusId
+      if (debouncedSearch.trim()) params.search = debouncedSearch.trim()
+      const data = await teamsApi.getTeams(Object.keys(params).length ? params : undefined)
       setTeams(data)
     } catch (error) {
       console.error("Failed to fetch teams list", error)
@@ -41,7 +51,7 @@ export default function TeamsPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [selectedCampus, isSuperAdmin, myCampusId])
+  }, [selectedCampus, isSuperAdmin, myCampusId, debouncedSearch])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -64,15 +74,7 @@ export default function TeamsPage() {
     toast.info("Fitur ini belum tersedia")
   }
 
-  // Client-side search filtering
-  const filteredTeams = teams.filter((t) => {
-    const query = searchQuery.toLowerCase().trim()
-    if (!query) return true
-    return (
-      t.name.toLowerCase().includes(query) || 
-      t.code.toLowerCase().includes(query)
-    )
-  })
+  // Client-side search removed: pencarian kini diproses di backend (param `search`).
 
   return (
     <div className="space-y-6">
@@ -117,7 +119,7 @@ export default function TeamsPage() {
 
       {/* Teams Grid List */}
       <TeamList
-        teams={filteredTeams}
+        teams={teams}
         isLoading={isLoading}
         onEdit={handleEditTeam}
         onDelete={handleDeleteTeam}

@@ -18,7 +18,7 @@ import {
 import { Card, CardContent } from "../../../components/ui/card"
 import { Button } from "../../../components/ui/button"
 import { toast } from "sonner"
-import { RefreshCw, Calendar, Award, MapPin } from "lucide-react"
+import { RefreshCw, Calendar, Award, MapPin, Trophy } from "lucide-react"
 
 export default function LeaderboardPage() {
   const { isSuperAdmin, getCampusId } = useAuth()
@@ -28,6 +28,7 @@ export default function LeaderboardPage() {
   const [selectedCampus, setSelectedCampus] = useState<number | null>(null)
   const [selectedWeek, setSelectedWeek] = useState<string>("")
   const [selectedActivity, setSelectedActivity] = useState<string>("GLOBAL")
+  const [topLimit, setTopLimit] = useState<string>("10")
 
   // Data States
   const [leaderboardData, setLeaderboardData] = useState<DeedLeaderboardResponseDto | null>(null)
@@ -89,6 +90,7 @@ export default function LeaderboardPage() {
       const campusId = !isSuperAdmin ? myCampusId : selectedCampus
       const params = {
         weekId: selectedWeek,
+        limit: Number(topLimit),
         ...(campusId ? { campusId } : {})
       }
 
@@ -106,7 +108,7 @@ export default function LeaderboardPage() {
     } finally {
       setIsLoadingData(false)
     }
-  }, [selectedCampus, selectedWeek, selectedActivity, isSuperAdmin, myCampusId])
+  }, [selectedCampus, selectedWeek, selectedActivity, topLimit, isSuperAdmin, myCampusId])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -173,7 +175,7 @@ export default function LeaderboardPage() {
       {/* Filter Card */}
       <Card className="border-border/60 shadow-md">
         <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Kampus */}
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
@@ -191,6 +193,10 @@ export default function LeaderboardPage() {
                 value={selectedWeek} 
                 onValueChange={(val) => setSelectedWeek(val || "")}
                 disabled={isLoadingFilterData}
+                items={Object.fromEntries(weeks.map((w) => [
+                  String(w.id),
+                  `Pekan ${w.weekNumber} (${w.startDate} s.d. ${w.endDate})`,
+                ]))}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={isLoadingFilterData ? "Memuat..." : "Pilih Pekan"} />
@@ -214,6 +220,10 @@ export default function LeaderboardPage() {
                 value={selectedActivity} 
                 onValueChange={(val) => setSelectedActivity(val || "GLOBAL")}
                 disabled={isLoadingFilterData}
+                items={{
+                  GLOBAL: "Klasemen Umum (Global)",
+                  ...Object.fromEntries(activities.map((act) => [String(act.id), act.name])),
+                }}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={isLoadingFilterData ? "Memuat..." : "Pilih Kategori"} />
@@ -225,6 +235,33 @@ export default function LeaderboardPage() {
                       {act.name}
                     </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Jumlah Top */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                <Trophy className="h-3 w-3 text-muted-foreground" /> Tampilkan Top
+              </label>
+              <Select
+                value={topLimit}
+                onValueChange={(val) => setTopLimit(val || "10")}
+                items={{
+                  "5": "Top 5",
+                  "10": "Top 10",
+                  "20": "Top 20",
+                  "50": "Top 50",
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Top 10" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">Top 5</SelectItem>
+                  <SelectItem value="10">Top 10</SelectItem>
+                  <SelectItem value="20">Top 20</SelectItem>
+                  <SelectItem value="50">Top 50</SelectItem>
                 </SelectContent>
               </Select>
             </div>
