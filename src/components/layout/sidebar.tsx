@@ -40,11 +40,16 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
     { name: 'Manajemen Tim', href: ROUTES.TEAMS, icon: Users },
   ];
 
-  const masterDataItems = [
-    { name: 'Manajemen Kampus', href: ROUTES.CAMPUSES, icon: Building },
-    { name: 'Manajemen Admin', href: ROUTES.ADMINS, icon: Shield },
-    { name: 'Manajemen Coach', href: ROUTES.COACHES, icon: UserCog },
-  ];
+  const masterDataItems = isSuperAdmin
+    ? [
+        { name: 'Manajemen Kampus', href: ROUTES.CAMPUSES, icon: Building },
+        { name: 'Manajemen Admin', href: ROUTES.ADMINS, icon: Shield },
+        { name: 'Manajemen Coach', href: ROUTES.COACHES, icon: UserCog },
+      ]
+    : [
+        // Admin Kampus hanya mengelola coach (tim dibatasi kampusnya)
+        { name: 'Manajemen Coach', href: ROUTES.COACHES, icon: UserCog },
+      ];
 
   const coachNavItems = [
     { name: 'Rekap Amalan Tim', href: ROUTES.COACH_DEED_SCORE, icon: BookOpen },
@@ -138,7 +143,7 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
             })}
           </nav>
 
-          {!isCoach && isSuperAdmin && (
+          {!isCoach && (
             <nav className="space-y-1 px-3 mt-8">
               <div className={cn("px-3 mb-2 text-xs font-semibold text-accent uppercase tracking-wider flex items-center gap-2", collapsed && "justify-center")}>
                 {collapsed ? '---' : (

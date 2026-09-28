@@ -26,8 +26,8 @@ import { Plus, Search, ShieldAlert, ShieldCheck, Users } from "lucide-react"
 type SearchBy = 'ALL' | 'NAME' | 'EMAIL' | 'PHONE' | 'TEAM'
 
 export default function CoachesPage() {
-  // Enforce Super Admin only
-  useRoleGuard(true)
+  // Super Admin & Admin Kampus (admin hanya bisa assign tim kampusnya)
+  useRoleGuard()
 
   const [coaches, setCoaches] = useState<CoachDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
