@@ -124,6 +124,11 @@ export function TransferCampusModal({ open, onOpenChange, admin, onSuccess }: Tr
             <Select
               value={campusIdValue ? String(campusIdValue) : ""}
               onValueChange={(val) => setValue("campusId", Number(val), { shouldValidate: true })}
+              items={Object.fromEntries(
+                campuses
+                  .filter((c) => c.id !== admin?.campusId)
+                  .map((c) => [String(c.id), c.name])
+              )}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={isLoadingCampuses ? "Memuat..." : "Pilih Kampus Baru"} />

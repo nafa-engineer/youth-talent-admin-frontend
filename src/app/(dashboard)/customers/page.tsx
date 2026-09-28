@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../../hooks/use-auth';
 import { useRoleGuard } from '../../../hooks/use-role-guard';
 import { customersApi } from '../../../lib/api/customers';
@@ -8,8 +8,11 @@ import { CustomerDto, Gender, EducationLevel, CustomerFilterParams } from '../..
 import { CustomerStats } from '../../../components/customers/customer-stats';
 import { CustomerFilters } from '../../../components/customers/customer-filters';
 import { CustomerTable } from '../../../components/customers/customer-table';
+import { Pagination } from '../../../components/shared/pagination';
 import { toast } from 'sonner';
 import { UserCheck } from 'lucide-react';
+
+type SearchBy = 'ALL' | 'NAME' | 'EMAIL' | 'PHONE';
 
 export default function CustomersPage() {
   useRoleGuard();
@@ -22,6 +25,14 @@ export default function CustomersPage() {
   const [genderFilter, setGenderFilter] = useState<Gender | null>(null);
   const [educationLevelFilter, setEducationLevelFilter] = useState<EducationLevel | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [searchBy, setSearchBy] = useState<SearchBy>('ALL');
+
+  // Pagination States
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
 
   // Data States
   const [customers, setCustomers] = useState<CustomerDto[]>([]);
@@ -30,46 +41,51 @@ export default function CustomersPage() {
   // Active Campus ID based on role
   const activeCampusId = !isSuperAdmin ? myCampusId : selectedCampus;
 
+  // Debounce search input (server-side search)
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Reset to first page whenever filters/search change
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPage(0);
+  }, [activeCampusId, hasTeamFilter, genderFilter, educationLevelFilter, debouncedSearch, searchBy, size]);
+
   const fetchCustomers = useCallback(async () => {
     setIsLoading(true);
     try {
-      const params: CustomerFilterParams = {};
+      const params: CustomerFilterParams = { page, size };
       if (activeCampusId !== null) params.campusId = activeCampusId;
       if (hasTeamFilter !== null) params.hasTeam = hasTeamFilter;
       if (genderFilter !== null) params.gender = genderFilter;
       if (educationLevelFilter !== null) params.educationLevel = educationLevelFilter;
+      if (debouncedSearch.trim()) {
+        params.search = debouncedSearch.trim();
+        params.searchBy = searchBy;
+      }
 
       const pageData = await customersApi.getCustomers(params);
       setCustomers(pageData.content || []);
+      setTotalPages(pageData.totalPages ?? 0);
+      setTotalElements(pageData.totalElements ?? 0);
     } catch (error) {
       console.error('Failed to fetch customers list', error);
       toast.error('Gagal memuat data peserta');
     } finally {
       setIsLoading(false);
     }
-  }, [activeCampusId, hasTeamFilter, genderFilter, educationLevelFilter]);
+  }, [activeCampusId, hasTeamFilter, genderFilter, educationLevelFilter, debouncedSearch, searchBy, page, size]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCustomers();
   }, [fetchCustomers]);
 
-  // Client-side search filtering by name, email, institution, domicile
-  const filteredCustomers = useMemo(() => {
-    if (!searchQuery.trim()) return customers;
-    const query = searchQuery.toLowerCase();
-    return customers.filter(
-      (c) =>
-        c.name.toLowerCase().includes(query) ||
-        c.email.toLowerCase().includes(query) ||
-        (c.institutionName && c.institutionName.toLowerCase().includes(query)) ||
-        (c.domicile && c.domicile.toLowerCase().includes(query)) ||
-        (c.teamName && c.teamName.toLowerCase().includes(query))
-    );
-  }, [customers, searchQuery]);
-
   const handleResetFilters = () => {
     setSearchQuery('');
+    setSearchBy('ALL');
     setHasTeamFilter(null);
     setGenderFilter(null);
     setEducationLevelFilter(null);
@@ -100,6 +116,8 @@ export default function CustomersPage() {
       <CustomerFilters
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        searchBy={searchBy}
+        onSearchByChange={setSearchBy}
         selectedCampusId={selectedCampus}
         onCampusChange={setSelectedCampus}
         hasTeamFilter={hasTeamFilter}
@@ -113,15 +131,19 @@ export default function CustomersPage() {
 
       {/* Data Table Section */}
       <div className="space-y-2">
-        <div className="flex justify-between items-center px-1">
-          <span className="text-xs font-medium text-muted-foreground">
-            Menampilkan {filteredCustomers.length} dari {customers.length} data peserta
-          </span>
-        </div>
         <CustomerTable
-          customers={filteredCustomers}
+          customers={customers}
           isLoading={isLoading}
           onRefresh={fetchCustomers}
+        />
+        <Pagination
+          page={page}
+          pageSize={size}
+          totalPages={totalPages}
+          totalElements={totalElements}
+          onPageChange={setPage}
+          onPageSizeChange={setSize}
+          isLoading={isLoading}
         />
       </div>
     </div>

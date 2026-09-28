@@ -41,7 +41,7 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
               <div key={act.deedActivityId} className="flex justify-between gap-4">
                 <span>{act.activityName}</span>
                 <span className="font-medium text-foreground">
-                  {act.averageValue.toFixed(1)} {act.unit}
+                  {(act.averageValue * 100).toFixed(1)}
                 </span>
               </div>
             ))}
@@ -66,10 +66,12 @@ export function DeedScoreSection({ campusId, isSuperAdmin, weekParams }: DeedSco
 
   const showCampusChart = isSuperAdmin && campusId === null;
 
-  // Helper to calculate total score from activities
+  // Helper to calculate total score from activities.
+  // Backend menyimpan skor sebagai fraksi 0-1; ditampilkan dalam skala 0-100.
   const calculateTotalScore = (dto: DeedScoreAverageDto) => {
     if (!dto || !dto.activities) return 0;
-    return dto.activities.reduce((sum, act) => sum + act.averageValue, 0);
+    const fraction = dto.activities.reduce((sum, act) => sum + act.averageValue, 0);
+    return fraction * 100;
   };
 
   useEffect(() => {
@@ -158,7 +160,7 @@ export function DeedScoreSection({ campusId, isSuperAdmin, weekParams }: DeedSco
                     {ikhwanActivities.slice(0, 3).map((act) => (
                       <div key={act.deedActivityId} className="flex justify-between">
                         <span>{act.activityName}</span>
-                        <span>{act.averageValue.toFixed(1)} {act.unit}</span>
+                        <span>{(act.averageValue * 100).toFixed(1)}</span>
                       </div>
                     ))}
                   </div>
@@ -188,7 +190,7 @@ export function DeedScoreSection({ campusId, isSuperAdmin, weekParams }: DeedSco
                     {akhwatActivities.slice(0, 3).map((act) => (
                       <div key={act.deedActivityId} className="flex justify-between">
                         <span>{act.activityName}</span>
-                        <span>{act.averageValue.toFixed(1)} {act.unit}</span>
+                        <span>{(act.averageValue * 100).toFixed(1)}</span>
                       </div>
                     ))}
                   </div>

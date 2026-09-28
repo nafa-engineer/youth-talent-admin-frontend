@@ -46,12 +46,25 @@ apiClient.interceptors.response.use(
       
       if (status === 401 || status === 403) {
         if (typeof window !== 'undefined') {
-          // Jangan redirect jika sudah di halaman login (agar login form
-          // bisa menampilkan pesan error dari response 401 via toast)
-          if (window.location.pathname !== '/login') {
+          const currentPath = window.location.pathname;
+          // Jangan redirect jika sudah di halaman login (admin atau coach)
+          // agar login form bisa menampilkan pesan error dari response 401 via toast
+          if (currentPath !== '/login' && !currentPath.startsWith('/coach/login')) {
             console.warn('apiClient interceptor caught 401/403. Redirecting to login. URL:', error.config?.url);
+            // Arahkan sesuai role: coach -> /coach/login, selain itu -> /login
+            let redirectPath = '/login?expired=true&from=apiClient';
+            try {
+              const authStorage = localStorage.getItem('auth-storage');
+              const parsed = authStorage ? JSON.parse(authStorage) : null;
+              const type = parsed?.state?.user?.type;
+              if (type === 'COACH' || currentPath.startsWith('/coach')) {
+                redirectPath = '/coach/login?expired=true&from=apiClient';
+              }
+            } catch (e) {
+              console.error('Error parsing role for redirect', e);
+            }
             localStorage.removeItem('auth-storage');
-            window.location.href = '/login?expired=true&from=apiClient';
+            window.location.href = redirectPath;
           }
         }
       }

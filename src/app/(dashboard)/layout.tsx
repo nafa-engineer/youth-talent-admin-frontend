@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Sidebar } from '../../components/layout/sidebar';
 import { Header } from '../../components/layout/header';
 import { useAuth } from '../../hooks/use-auth';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ROUTES } from '../../lib/constants';
 
 export default function DashboardLayout({
@@ -11,8 +11,9 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, hasHydrated, isCoach } = useAuth();
+  const { isAuthenticated, hasHydrated } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [isClient, setIsClient] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -20,9 +21,13 @@ export default function DashboardLayout({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsClient(true);
     if (hasHydrated && !isAuthenticated) {
-      router.replace((isCoach ? ROUTES.COACH_LOGIN : ROUTES.LOGIN) + '?from=layout');
+      // Area coach (mis. /coach, /coach/mentoring) harus diarahkan ke login coach,
+      // bukan login admin. Saat belum login, isCoach selalu false, jadi tentukan
+      // dari path.
+      const isCoachPath = pathname?.startsWith('/coach');
+      router.replace((isCoachPath ? ROUTES.COACH_LOGIN : ROUTES.LOGIN) + '?from=layout');
     }
-  }, [hasHydrated, isAuthenticated, isCoach, router]);
+  }, [hasHydrated, isAuthenticated, pathname, router]);
 
   // Prevent hydration mismatch and redirect race condition by waiting until store has hydrated
   if (!isClient || !hasHydrated) return null;

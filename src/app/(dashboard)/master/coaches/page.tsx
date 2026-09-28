@@ -5,43 +5,77 @@ import { useRoleGuard } from "../../../../hooks/use-role-guard"
 import { coachesApi } from "../../../../lib/api/coaches"
 import { CoachDto } from "../../../../types/api"
 import { DataTable, ColumnDef } from "../../../../components/shared/data-table"
+import { Pagination } from "../../../../components/shared/pagination"
 import { CoachFormModal } from "../../../../components/master/coaches/coach-form-modal"
 import { AssignTeamModal } from "../../../../components/master/coaches/assign-team-modal"
 import { Button } from "../../../../components/ui/button"
 import { Input } from "../../../../components/ui/input"
 import { Card, CardContent } from "../../../../components/ui/card"
 import { Badge } from "../../../../components/ui/badge"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../components/ui/select"
 import { formatDate } from "../../../../lib/utils"
 import { toast } from "sonner"
 import { Plus, Search, ShieldAlert, ShieldCheck, Users } from "lucide-react"
 
+type SearchBy = 'ALL' | 'NAME' | 'EMAIL' | 'PHONE' | 'TEAM'
+
 export default function CoachesPage() {
-  // Enforce Super Admin only
-  useRoleGuard(true)
+  // Super Admin & Admin Kampus (admin hanya bisa assign tim kampusnya)
+  useRoleGuard()
 
   const [coaches, setCoaches] = useState<CoachDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  const [searchBy, setSearchBy] = useState<SearchBy>('ALL')
+
+  // Pagination
+  const [page, setPage] = useState(0)
+  const [size, setSize] = useState(10)
+  const [totalPages, setTotalPages] = useState(0)
+  const [totalElements, setTotalElements] = useState(0)
 
   const [isFormOpen, setIsFormOpen] = useState(false)
 
   const [isAssignOpen, setIsAssignOpen] = useState(false)
-  const [selectedCoachIdForAssign, setSelectedCoachIdForAssign] = useState<number | null>(null)
+  const [selectedCoachForAssign, setSelectedCoachForAssign] = useState<CoachDto | null>(null)
 
-  const selectedCoachForAssign = coaches.find((c) => c.id === selectedCoachIdForAssign) ?? null
+  // Debounce search (server-side search)
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 400)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  // Reset to first page when search changes
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPage(0)
+  }, [debouncedSearch, searchBy, size])
 
   const fetchCoaches = useCallback(async () => {
     setIsLoading(true)
     try {
-      const data = await coachesApi.getCoaches()
-      setCoaches(data)
+      const data = await coachesApi.getCoaches({
+        page,
+        size,
+        ...(debouncedSearch.trim() ? { search: debouncedSearch.trim(), searchBy } : {}),
+      })
+      setCoaches(data.content || [])
+      setTotalPages(data.totalPages ?? 0)
+      setTotalElements(data.totalElements ?? 0)
     } catch (error) {
       console.error("Failed to fetch coaches", error)
       toast.error("Gagal memuat daftar coach")
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [page, size, debouncedSearch, searchBy])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -53,8 +87,8 @@ export default function CoachesPage() {
   }
 
   const handleManageTeams = (coach: CoachDto) => {
-  setSelectedCoachIdForAssign(coach.id)
-  setIsAssignOpen(true)
+    setSelectedCoachForAssign(coach)
+    setIsAssignOpen(true)
   }
 
   const handleToggleActive = async (coach: CoachDto) => {
@@ -77,16 +111,6 @@ export default function CoachesPage() {
     }
   }
 
-  const filteredCoaches = coaches.filter((c) => {
-    const query = searchQuery.toLowerCase().trim()
-    if (!query) return true
-    return (
-      c.name.toLowerCase().includes(query) ||
-      c.email.toLowerCase().includes(query) ||
-      c.teams.some((t) => t.name.toLowerCase().includes(query))
-    )
-  })
-
   const columns: ColumnDef<CoachDto>[] = [
     {
       header: "Coach",
@@ -95,6 +119,12 @@ export default function CoachesPage() {
           <span className="font-semibold text-foreground">{row.name}</span>
           <span className="text-xs text-muted-foreground">{row.email}</span>
         </div>
+      ),
+    },
+    {
+      header: "Nomor HP",
+      render: (row) => (
+        <span className="text-sm">{row.phoneNumber ? row.phoneNumber : "-"}</span>
       ),
     },
     {
@@ -195,23 +225,59 @@ export default function CoachesPage() {
 
       <Card className="border-border/60 shadow-md">
         <CardContent className="pt-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Cari berdasarkan nama, email, atau tim..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-9"
-            />
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Cari berdasarkan nama, email, nomor HP, atau tim..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 h-9"
+              />
+            </div>
+            <div className="w-full sm:w-48">
+              <Select
+                value={searchBy}
+                onValueChange={(val) => setSearchBy(val as SearchBy)}
+                items={{
+                  ALL: "Semua Kolom",
+                  NAME: "Nama",
+                  EMAIL: "Email",
+                  PHONE: "No. HP",
+                  TEAM: "Tim",
+                }}
+              >
+                <SelectTrigger className="w-full h-9">
+                  <SelectValue placeholder="Cari Berdasarkan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">Semua Kolom</SelectItem>
+                  <SelectItem value="NAME">Nama</SelectItem>
+                  <SelectItem value="EMAIL">Email</SelectItem>
+                  <SelectItem value="PHONE">No. HP</SelectItem>
+                  <SelectItem value="TEAM">Tim</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       <DataTable
         columns={columns}
-        data={filteredCoaches}
+        data={coaches}
         isLoading={isLoading}
         emptyMessage="Tidak ada data coach yang ditemukan."
+      />
+
+      <Pagination
+        page={page}
+        pageSize={size}
+        totalPages={totalPages}
+        totalElements={totalElements}
+        onPageChange={setPage}
+        onPageSizeChange={setSize}
+        isLoading={isLoading}
       />
 
       <CoachFormModal

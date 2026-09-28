@@ -44,6 +44,18 @@ export default function CoachMentoringPage() {
         </span>
       ),
     },
+    {
+      header: "Persentase",
+      render: (row) => (
+        <span className={`text-sm font-semibold ${
+          (row.attendancePercentage ?? 0) >= 80 ? "text-green-600" :
+          (row.attendancePercentage ?? 0) >= 50 ? "text-yellow-600" :
+          "text-red-600"
+        }`}>
+          {row.attendancePercentage?.toFixed(0) ?? 0}%
+        </span>
+      ),
+    },
   ]
 
   return (

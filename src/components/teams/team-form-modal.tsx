@@ -198,6 +198,7 @@ export function TeamFormModal({ open, onOpenChange, team, onSuccess }: TeamFormM
               <Select
                 value={genderValue || ""}
                 onValueChange={(val) => setValue("gender", val as "PRIA" | "WANITA", { shouldValidate: true })}
+                items={{ PRIA: "Pria (Ikhwan)", WANITA: "Wanita (Akhwat)" }}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Pilih Gender" />
@@ -226,6 +227,7 @@ export function TeamFormModal({ open, onOpenChange, team, onSuccess }: TeamFormM
               <Select
                 value={campusIdValue ? String(campusIdValue) : ""}
                 onValueChange={(val) => setValue("campusId", Number(val), { shouldValidate: true })}
+                items={Object.fromEntries(campuses.map((c) => [String(c.id), c.name]))}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={isLoadingCampuses ? "Memuat..." : "Pilih Kampus"} />

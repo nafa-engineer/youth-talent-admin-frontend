@@ -8,6 +8,7 @@ import { weeksApi } from "../../../../lib/api/weeks"
 import { MentoringAttendanceRecapDto, TeamDto, WeekDto } from "../../../../types/api"
 import { CampusFilter } from "../../../../components/shared/campus-filter"
 import { RecapTable } from "../../../../components/mentoring/recap-table"
+import { Pagination } from "../../../../components/shared/pagination"
 import {
   Select,
   SelectContent,
@@ -34,6 +35,18 @@ export default function MentoringRecapPage() {
   const [teams, setTeams] = useState<TeamDto[]>([])
   const [weeks, setWeeks] = useState<WeekDto[]>([])
   const [currentWeek, setCurrentWeek] = useState<WeekDto | null>(null)
+
+  // Pagination States
+  const [page, setPage] = useState(0)
+  const [size, setSize] = useState(10)
+  const [totalPages, setTotalPages] = useState(0)
+  const [totalElements, setTotalElements] = useState(0)
+
+  // Summary States (agregat seluruh data, bukan per halaman)
+  const [summaryTotal, setSummaryTotal] = useState(0)
+  const [summaryAverage, setSummaryAverage] = useState(0)
+  const [summaryPassing, setSummaryPassing] = useState(0)
+  const [summaryAttention, setSummaryAttention] = useState(0)
   
   // Loading States
   const [isLoadingRecaps, setIsLoadingRecaps] = useState(false)
@@ -76,6 +89,12 @@ export default function MentoringRecapPage() {
     fetchWeeksAndTeams()
   }, [selectedCampus, isSuperAdmin, myCampusId])
 
+  // Reset to first page when filters change
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPage(0)
+  }, [selectedCampus, selectedGender, selectedTeam, selectedWeek, size])
+
   // Fetch mentoring recap data on filter change
   useEffect(() => {
     const fetchRecap = async () => {
@@ -100,8 +119,19 @@ export default function MentoringRecapPage() {
           params.endDate = sortedWeeks[sortedWeeks.length - 1].endDate
         }
 
-        const data = await mentoringApi.getMentoringRecap(params as MentoringRecapParams)
-        setRecaps(data)
+        const [data, summary] = await Promise.all([
+          mentoringApi.getMentoringRecap({ ...params, page, size } as MentoringRecapParams),
+          mentoringApi.getRecapSummary(params),
+        ])
+
+        setRecaps(data.content || [])
+        setTotalPages(data.totalPages ?? 0)
+        setTotalElements(data.totalElements ?? 0)
+
+        setSummaryTotal(summary.totalCustomers ?? 0)
+        setSummaryAverage(summary.averageAttendancePercentage ?? 0)
+        setSummaryPassing(summary.passingCount ?? 0)
+        setSummaryAttention(summary.attentionCount ?? 0)
       } catch (error) {
         console.error("Failed to fetch mentoring recap", error)
         toast.error("Gagal memuat data rekap mentoring")
@@ -111,7 +141,7 @@ export default function MentoringRecapPage() {
     }
 
     fetchRecap()
-  }, [selectedCampus, selectedGender, selectedTeam, selectedWeek, isSuperAdmin, myCampusId, weeks])
+  }, [selectedCampus, selectedGender, selectedTeam, selectedWeek, isSuperAdmin, myCampusId, weeks, page, size])
 
   // Reset team filter when campus filter changes
   const handleCampusChange = (campusId: number | null) => {
@@ -119,19 +149,11 @@ export default function MentoringRecapPage() {
     setSelectedTeam("ALL")
   }
 
-  // Calculate stats
-  const totalParticipants = recaps.length
-  
-  const averageAttendance = totalParticipants > 0 
-    ? (recaps.reduce((acc, curr) => acc + (curr.totalSessions > 0 ? (curr.totalAttendance / curr.totalSessions) : 0), 0) / totalParticipants) * 100
-    : 0
-
-  const passingCount = recaps.filter(r => {
-    const pct = r.totalSessions > 0 ? (r.totalAttendance / r.totalSessions) * 100 : 0
-    return pct >= 80
-  }).length
-
-  const attentionCount = totalParticipants - passingCount
+  // Stats diambil dari summary endpoint (agregat seluruh data, bukan hanya halaman aktif)
+  const totalParticipants = summaryTotal
+  const averageAttendance = summaryAverage
+  const passingCount = summaryPassing
+  const attentionCount = summaryAttention
 
   return (
     <div className="space-y-6">
@@ -162,7 +184,7 @@ export default function MentoringRecapPage() {
               <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Gender
               </label>
-              <Select value={selectedGender} onValueChange={(val) => setSelectedGender(val || "ALL")}>
+              <Select value={selectedGender} onValueChange={(val) => setSelectedGender(val || "ALL")} items={{ ALL: "Semua Gender", PRIA: "Ikhwan (Pria)", WANITA: "Akhwat (Wanita)" }}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Semua Gender" />
                 </SelectTrigger>
@@ -179,7 +201,15 @@ export default function MentoringRecapPage() {
               <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Tim / Halaqah
               </label>
-              <Select value={selectedTeam} onValueChange={(val) => setSelectedTeam(val || "ALL")} disabled={isLoadingFilterData}>
+              <Select
+                value={selectedTeam}
+                onValueChange={(val) => setSelectedTeam(val || "ALL")}
+                disabled={isLoadingFilterData}
+                items={{
+                  ALL: "Semua Tim",
+                  ...Object.fromEntries(teams.map((t) => [String(t.id), t.name])),
+                }}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={isLoadingFilterData ? "Memuat..." : "Semua Tim"} />
                 </SelectTrigger>
@@ -199,7 +229,17 @@ export default function MentoringRecapPage() {
               <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Pekan
               </label>
-              <Select value={selectedWeek} onValueChange={(val) => setSelectedWeek(val || "ALL")}>
+              <Select
+                value={selectedWeek}
+                onValueChange={(val) => setSelectedWeek(val || "ALL")}
+                items={{
+                  ALL: "Semua Pekan (2 bulan terakhir)",
+                  ...Object.fromEntries(weeks.map((w) => [
+                    String(w.id),
+                    `Pekan ${w.weekNumber} (${w.startDate} s.d. ${w.endDate})`,
+                  ])),
+                }}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Semua Pekan" />
                 </SelectTrigger>
@@ -307,6 +347,15 @@ export default function MentoringRecapPage() {
           )}
         </div>
         <RecapTable data={recaps} isLoading={isLoadingRecaps} />
+        <Pagination
+          page={page}
+          pageSize={size}
+          totalPages={totalPages}
+          totalElements={totalElements}
+          onPageChange={setPage}
+          onPageSizeChange={setSize}
+          isLoading={isLoadingRecaps}
+        />
       </div>
     </div>
   )

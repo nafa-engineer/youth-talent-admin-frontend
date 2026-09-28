@@ -25,6 +25,7 @@ export interface DeedLeaderboardItemDto {
   teamName: string;
   campusName: string;
   score: number;
+  gender?: Gender | null;
 }
 
 export interface DeedLeaderboardResponseDto {
@@ -87,6 +88,18 @@ export interface PageCustomerDto {
   content: CustomerDto[];
 }
 
+export interface PageResponse<T> {
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  numberOfElements: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+  content: T[];
+}
+
 export interface CustomerTransferTeamRequestDto {
   customerId: number;
   teamId: number;
@@ -100,6 +113,8 @@ export interface CustomerFilterParams {
   gender?: Gender;
   educationLevel?: EducationLevel;
   hasTeam?: boolean;
+  search?: string;
+  searchBy?: 'ALL' | 'NAME' | 'EMAIL' | 'PHONE';
   page?: number;
   size?: number;
 }
@@ -179,6 +194,8 @@ export interface MentoringAttendanceSummaryDto {
   gender: Gender | null;
   totalCustomers: number;
   averageAttendancePercentage: number;
+  passingCount?: number;
+  attentionCount?: number;
 }
 
 // Deed Score Average DTOs
@@ -213,6 +230,7 @@ export interface CoachDto {
   gender: Gender;
   isActive: boolean;
   isInternal: boolean;
+  phoneNumber?: string;
   teams: TeamSummaryDto[];
   createdAt: string; // ISO Date string
 }
@@ -221,6 +239,7 @@ export interface CoachRequestDto {
   name: string;
   email: string;
   password: string;
+  phoneNumber: string;
   gender: Gender;
   isInternal: boolean;
 }
@@ -246,11 +265,5 @@ export interface CoachMentoringRecapDto {
   teamName: string;
   totalCustomers: number;
   totalAttendance: number;
-}
-export interface CoachDeedScoreAverageDto {
-  weekId: number;
-  weekLabel: string;
-  teamId: number;
-  teamName: string;
-  averageScore: number; // 0.0–1.0, kalikan 100 untuk tampilan poin
+  attendancePercentage: number;
 }

@@ -133,6 +133,13 @@ export default function DashboardPage() {
               value={selectedWeek} 
               onValueChange={(val) => setSelectedWeek(val || "ALL")}
               disabled={isLoadingWeeks}
+              items={{
+                ALL: "Semua Pekan (2 bulan terakhir)",
+                ...Object.fromEntries(weeks.map((w) => [
+                  String(w.id),
+                  `Pekan ${w.weekNumber} (${w.startDate} s.d. ${w.endDate})`,
+                ])),
+              }}
             >
               <SelectTrigger className="w-full bg-card">
                 <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />

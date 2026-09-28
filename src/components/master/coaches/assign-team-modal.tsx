@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from "react"
 import { coachesApi } from "../../../lib/api/coaches"
 import { teamsApi } from "../../../lib/api/teams"
-import { CoachDto, TeamDto } from "../../../types/api"
+import { CoachDto, TeamDto, TeamSummaryDto } from "../../../types/api"
+import { useAuth } from "../../../hooks/use-auth"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../../ui/dialog"
 import { Label } from "../../ui/label"
 import { Button } from "../../ui/button"
@@ -26,17 +27,26 @@ interface AssignTeamModalProps {
 }
 
 export function AssignTeamModal({ open, onOpenChange, coach, onSuccess }: AssignTeamModalProps) {
+  const { isSuperAdmin, getCampusId } = useAuth()
+  const myCampusId = getCampusId()
+
   const [teams, setTeams] = useState<TeamDto[]>([])
   const [isLoadingTeams, setIsLoadingTeams] = useState(false)
   const [selectedTeamId, setSelectedTeamId] = useState<string>("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Admin Kampus hanya boleh mengelola tim dari kampusnya sendiri
+  const canManageTeam = (team: TeamSummaryDto) =>
+    isSuperAdmin || (myCampusId !== null && team.campusId === myCampusId)
 
   useEffect(() => {
     if (!open) return
     const fetchTeams = async () => {
       setIsLoadingTeams(true)
       try {
-        const data = await teamsApi.getTeams()
+        // Admin Kampus: batasi pilihan ke tim kampusnya
+        const params = !isSuperAdmin && myCampusId ? { campusId: myCampusId } : undefined
+        const data = await teamsApi.getTeams(params)
         setTeams(data)
       } catch (error) {
         console.error("Failed to load teams", error)
@@ -46,7 +56,7 @@ export function AssignTeamModal({ open, onOpenChange, coach, onSuccess }: Assign
       }
     }
     fetchTeams()
-  }, [open])
+  }, [open, isSuperAdmin, myCampusId])
 
   const assignedTeamIds = new Set((coach?.teams || []).map((t) => t.id))
   const availableTeams = teams.filter((t) => !assignedTeamIds.has(t.id))
@@ -105,14 +115,23 @@ export function AssignTeamModal({ open, onOpenChange, coach, onSuccess }: Assign
               {(coach?.teams || []).map((t) => (
                 <Badge key={t.id} variant="secondary" className="flex items-center gap-1 pr-1">
                   {t.name}
-                  <button
-                    type="button"
-                    onClick={() => handleUnassign(t.id, t.name)}
-                    className="ml-1 rounded-full hover:bg-rose-500/20 p-0.5"
-                    title="Hapus tim"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
+                  {canManageTeam(t) ? (
+                    <button
+                      type="button"
+                      onClick={() => handleUnassign(t.id, t.name)}
+                      className="ml-1 rounded-full hover:bg-rose-500/20 p-0.5"
+                      title="Hapus tim"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  ) : (
+                    <span
+                      className="ml-1 text-[10px] text-muted-foreground"
+                      title="Tim kampus lain — hanya bisa dikelola Super Admin"
+                    >
+                      🔒
+                    </span>
+                  )}
                 </Badge>
               ))}
             </div>
@@ -122,7 +141,11 @@ export function AssignTeamModal({ open, onOpenChange, coach, onSuccess }: Assign
           <div className="space-y-1">
             <Label htmlFor="teamId">Tambah Tim</Label>
             <div className="flex gap-2">
-              <Select value={selectedTeamId} onValueChange={(val) => setSelectedTeamId(val ?? "")}>
+              <Select
+                value={selectedTeamId}
+                onValueChange={(val) => setSelectedTeamId(val ?? "")}
+                items={Object.fromEntries(availableTeams.map((t) => [String(t.id), t.name]))}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={isLoadingTeams ? "Memuat..." : "Pilih Tim"} />
                 </SelectTrigger>
