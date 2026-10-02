@@ -48,12 +48,19 @@ export async function downloadExcel(path: string, params: DownloadParams, filena
   }
 
   const blob = await res.blob();
+  const serverFilename = getFilenameFromDisposition(res.headers.get('content-disposition'));
   const objectUrl = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = objectUrl;
-  a.download = filename;
+  a.download = serverFilename || filename;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(objectUrl);
+}
+
+function getFilenameFromDisposition(disposition: string | null): string | null {
+  if (!disposition) return null;
+  const match = /filename\*?=(?:UTF-8'')?["']?([^"';]+)/i.exec(disposition);
+  return match ? decodeURIComponent(match[1].trim()) : null;
 }
