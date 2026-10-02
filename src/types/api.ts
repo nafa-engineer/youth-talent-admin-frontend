@@ -181,6 +181,7 @@ export interface AdminRequestDto {
   password?: string;
   adminGroupId: number;
   campusId: number | null;
+  currentPassword?: string;
 }
 
 export interface AdminTransferCampusRequestDto {
