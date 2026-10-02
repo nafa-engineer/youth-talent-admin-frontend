@@ -10,7 +10,9 @@ import { CustomerFilters } from '../../../components/customers/customer-filters'
 import { CustomerTable } from '../../../components/customers/customer-table';
 import { Pagination } from '../../../components/shared/pagination';
 import { toast } from 'sonner';
-import { UserCheck } from 'lucide-react';
+import { UserCheck, Download } from 'lucide-react';
+import { Button } from '../../../components/ui/button';
+import { downloadExcel } from '../../../lib/download';
 
 type SearchBy = 'ALL' | 'NAME' | 'EMAIL' | 'PHONE';
 
@@ -37,6 +39,7 @@ export default function CustomersPage() {
   // Data States
   const [customers, setCustomers] = useState<CustomerDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Active Campus ID based on role
   const activeCampusId = !isSuperAdmin ? myCampusId : selectedCampus;
@@ -94,6 +97,32 @@ export default function CustomersPage() {
     }
   };
 
+  const handleExport = async () => {
+    setIsExporting(true);
+    const toastId = toast.loading('Menyiapkan file Excel...');
+    try {
+      const params: Record<string, unknown> = {};
+      if (activeCampusId !== null) params.campusId = activeCampusId;
+      if (hasTeamFilter !== null) params.hasTeam = hasTeamFilter;
+      if (genderFilter !== null) params.gender = genderFilter;
+      if (educationLevelFilter !== null) params.educationLevel = educationLevelFilter;
+      if (debouncedSearch.trim()) {
+        params.search = debouncedSearch.trim();
+        params.searchBy = searchBy;
+      }
+      await downloadExcel(
+        '/api/v1/customers/export',
+        params,
+        `peserta_${new Date().toISOString().split('T')[0]}.xlsx`
+      );
+      toast.success('File Excel berhasil diunduh', { id: toastId });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Gagal mengunduh file Excel', { id: toastId });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -107,6 +136,15 @@ export default function CustomersPage() {
             Kelola data mahasiswa/santri terdaftar, penugasan tim halaqah, dan status keanggotaan.
           </p>
         </div>
+        <Button
+          onClick={handleExport}
+          disabled={isExporting}
+          variant="outline"
+          className="w-full md:w-auto shadow-sm"
+        >
+          <Download className={`h-4 w-4 mr-2 ${isExporting ? "animate-pulse" : ""}`} />
+          Export Excel
+        </Button>
       </div>
 
       {/* Summary Cards */}

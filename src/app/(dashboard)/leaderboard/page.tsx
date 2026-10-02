@@ -17,8 +17,9 @@ import {
 } from "../../../components/ui/select"
 import { Card, CardContent } from "../../../components/ui/card"
 import { Button } from "../../../components/ui/button"
+import { downloadExcel } from "../../../lib/download"
 import { toast } from "sonner"
-import { RefreshCw, Calendar, Award, MapPin, Trophy } from "lucide-react"
+import { RefreshCw, Calendar, Award, MapPin, Trophy, Download } from "lucide-react"
 
 export default function LeaderboardPage() {
   const { isSuperAdmin, getCampusId } = useAuth()
@@ -39,6 +40,7 @@ export default function LeaderboardPage() {
   const [isLoadingData, setIsLoadingData] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
   const [isLoadingFilterData, setIsLoadingFilterData] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
 
   // Fetch weeks and deed activities on load
   useEffect(() => {
@@ -135,6 +137,29 @@ export default function LeaderboardPage() {
     }
   }
 
+  const handleExport = async () => {
+    if (!selectedWeek) return
+    setIsExporting(true)
+    const toastId = toast.loading("Menyiapkan file Excel...")
+    try {
+      const campusId = !isSuperAdmin ? myCampusId : selectedCampus
+      const params: Record<string, unknown> = { weekId: selectedWeek }
+      if (campusId) params.campusId = campusId
+      if (selectedActivity !== "GLOBAL") params.activityId = selectedActivity
+
+      await downloadExcel(
+        "/api/v1/leaderboard/export",
+        params,
+        `klasemen_mutabaah_${new Date().toISOString().split('T')[0]}.xlsx`
+      )
+      toast.success("File Excel berhasil diunduh", { id: toastId })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Gagal mengunduh file Excel", { id: toastId })
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
   // Format generated time
   const formatGeneratedAt = (isoString?: string) => {
     if (!isoString) return "-"
@@ -162,14 +187,25 @@ export default function LeaderboardPage() {
           </p>
         </div>
 
-        <Button
-          onClick={handleGenerateLeaderboard}
-          disabled={isGenerating || isLoadingFilterData || !selectedWeek}
-          className="w-full sm:w-auto shadow-md hover:shadow-lg transition-all"
-        >
-          <RefreshCw className={`mr-2 h-4 w-4 ${isGenerating ? "animate-spin" : ""}`} />
-          Hitung Ulang Klasemen
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button
+            onClick={handleExport}
+            disabled={isExporting || isLoadingFilterData || !selectedWeek}
+            variant="outline"
+            className="w-full sm:w-auto shadow-md hover:shadow-lg transition-all"
+          >
+            <Download className={`mr-2 h-4 w-4 ${isExporting ? "animate-pulse" : ""}`} />
+            Export Excel
+          </Button>
+          <Button
+            onClick={handleGenerateLeaderboard}
+            disabled={isGenerating || isLoadingFilterData || !selectedWeek}
+            className="w-full sm:w-auto shadow-md hover:shadow-lg transition-all"
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${isGenerating ? "animate-spin" : ""}`} />
+            Hitung Ulang Klasemen
+          </Button>
+        </div>
       </div>
 
       {/* Filter Card */}

@@ -17,8 +17,10 @@ import {
   SelectValue,
 } from "../../../../components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card"
+import { Button } from "../../../../components/ui/button"
+import { downloadExcel } from "../../../../lib/download"
 import { toast } from "sonner"
-import { Users, CheckCircle, AlertTriangle, Activity } from "lucide-react"
+import { Users, CheckCircle, AlertTriangle, Activity, Download } from "lucide-react"
 
 export default function MentoringRecapPage() {
   const { isSuperAdmin, getCampusId } = useAuth()
@@ -51,6 +53,7 @@ export default function MentoringRecapPage() {
   // Loading States
   const [isLoadingRecaps, setIsLoadingRecaps] = useState(false)
   const [isLoadingFilterData, setIsLoadingFilterData] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
 
   // Fetch filter options (weeks and teams based on campus)
   useEffect(() => {
@@ -147,6 +150,37 @@ export default function MentoringRecapPage() {
   const handleCampusChange = (campusId: number | null) => {
     setSelectedCampus(campusId)
     setSelectedTeam("ALL")
+  }
+
+  const handleExport = async () => {
+    setIsExporting(true)
+    const toastId = toast.loading("Menyiapkan file Excel...")
+    try {
+      const campusId = !isSuperAdmin ? myCampusId : selectedCampus
+      const params: Record<string, unknown> = {}
+      if (campusId) params.campusId = campusId
+      if (selectedGender !== "ALL") params.gender = selectedGender
+      if (selectedTeam !== "ALL") params.teamId = Number(selectedTeam)
+
+      if (selectedWeek !== "ALL") {
+        params.weekIds = [Number(selectedWeek)]
+      } else if (weeks.length > 0) {
+        const sortedWeeks = [...weeks].sort((a, b) => a.weekNumber - b.weekNumber)
+        params.startDate = sortedWeeks[0].startDate
+        params.endDate = sortedWeeks[sortedWeeks.length - 1].endDate
+      }
+
+      await downloadExcel(
+        "/api/v1/mentoring/recap/export",
+        params,
+        `rekap_mentoring_${new Date().toISOString().split('T')[0]}.xlsx`
+      )
+      toast.success("File Excel berhasil diunduh", { id: toastId })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Gagal mengunduh file Excel", { id: toastId })
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   // Stats diambil dari summary endpoint (agregat seluruh data, bukan hanya halaman aktif)
@@ -326,8 +360,20 @@ export default function MentoringRecapPage() {
 
       {/* Recap Table */}
       <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-foreground">Daftar Kehadiran</h2>
+        <div className="flex justify-between items-center gap-3">
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold text-foreground">Daftar Kehadiran</h2>
+            <Button
+              onClick={handleExport}
+              disabled={isExporting || isLoadingRecaps}
+              variant="outline"
+              size="sm"
+              className="shadow-sm"
+            >
+              <Download className={`h-4 w-4 mr-2 ${isExporting ? "animate-pulse" : ""}`} />
+              Export Excel
+            </Button>
+          </div>
           {currentWeek && (
             <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-muted text-muted-foreground">
               Pekan Berjalan: {selectedWeek === "ALL"
