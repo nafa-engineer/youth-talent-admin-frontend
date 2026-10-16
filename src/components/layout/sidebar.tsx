@@ -18,7 +18,9 @@ import {
   UserCog,
   User,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Megaphone,
+  MapPin
 } from 'lucide-react';
 import { Button } from '../ui/button';
 
@@ -45,6 +47,8 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
         { name: 'Manajemen Kampus', href: ROUTES.CAMPUSES, icon: Building },
         { name: 'Manajemen Admin', href: ROUTES.ADMINS, icon: Shield },
         { name: 'Manajemen Coach', href: ROUTES.COACHES, icon: UserCog },
+        { name: 'Banner & Pengisian', href: ROUTES.PROMPTS, icon: Megaphone },
+        { name: 'Mapping Wilayah', href: ROUTES.DISTRICT_MAP, icon: MapPin },
       ]
     : [
         // Admin Kampus hanya mengelola coach (tim dibatasi kampusnya)
