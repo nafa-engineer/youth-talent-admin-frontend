@@ -58,6 +58,15 @@ export interface WeekDto {
 }
 
 // Customer DTOs
+export interface RegionDetail {
+  villageCode: string;
+  village: string;
+  district: string | null;
+  city: string | null;
+  province: string | null;
+  postalCode: string | null;
+}
+
 export interface CustomerDto {
   id: number;
   name: string;
@@ -74,6 +83,8 @@ export interface CustomerDto {
   campusId: number | null;
   campusName: string | null;
   createdAt: string; // ISO Date string
+  originRegion?: RegionDetail | null;
+  domicileRegion?: RegionDetail | null;
 }
 
 export interface PageCustomerDto {
