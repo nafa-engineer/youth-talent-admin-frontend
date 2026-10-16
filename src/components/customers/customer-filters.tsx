@@ -14,6 +14,7 @@ import { GENDER_OPTIONS, EDUCATION_LEVEL_OPTIONS } from '../../lib/constants';
 import { Gender, EducationLevel } from '../../types/api';
 import { Search, X } from 'lucide-react';
 import { Button } from '../ui/button';
+import { RegionCascade, RegionValue } from '../shared/region-cascade';
 
 interface CustomerFiltersProps {
   searchQuery: string;
@@ -28,6 +29,8 @@ interface CustomerFiltersProps {
   onGenderChange: (gender: Gender | null) => void;
   educationLevelFilter: EducationLevel | null;
   onEducationLevelChange: (educationLevel: EducationLevel | null) => void;
+  region: RegionValue;
+  onRegionChange: (region: RegionValue) => void;
   onResetFilters: () => void;
 }
 
@@ -44,13 +47,18 @@ export function CustomerFilters({
   onGenderChange,
   educationLevelFilter,
   onEducationLevelChange,
+  region,
+  onRegionChange,
   onResetFilters,
 }: CustomerFiltersProps) {
   const hasActiveFilters =
     searchQuery !== '' ||
     hasTeamFilter !== null ||
     genderFilter !== null ||
-    educationLevelFilter !== null;
+    educationLevelFilter !== null ||
+    region.provinceCode !== '' ||
+    region.cityCode !== '' ||
+    region.districtCode !== '';
 
   const hasTeamItems = {
     ALL: 'Semua Status Tim',
@@ -192,6 +200,9 @@ export function CustomerFilters({
           </SelectContent>
         </Select>
       </div>
+
+      {/* Region Filter (Provinsi/Kab/Kecamatan) */}
+      <RegionCascade value={region} onChange={onRegionChange} className="w-full" />
 
       {/* Reset Button */}
       {hasActiveFilters && (

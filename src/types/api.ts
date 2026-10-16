@@ -126,8 +126,24 @@ export interface CustomerFilterParams {
   hasTeam?: boolean;
   search?: string;
   searchBy?: 'ALL' | 'NAME' | 'EMAIL' | 'PHONE';
+  provinceCode?: string;
+  cityCode?: string;
+  districtCode?: string;
   page?: number;
   size?: number;
+}
+
+export interface RegionOption {
+  code: string;
+  name: string;
+}
+
+export interface RegionDistribution {
+  code: string;
+  name: string;
+  count: number;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 // Team DTOs
@@ -278,4 +294,51 @@ export interface CoachMentoringRecapDto {
   totalCustomers: number;
   totalAttendance: number;
   attendancePercentage: number;
+}
+
+// Prompt / Banner DTOs
+export type PromptAudience = 'CUSTOMER' | 'ADMIN' | 'COACH';
+
+export interface FillinPromptDto {
+  id: number;
+  code: string;
+  title: string;
+  message: string | null;
+  ctaLabel: string | null;
+  ctaAction: string | null;
+  audience: PromptAudience;
+  isActive: boolean;
+  dismissible: boolean;
+  startAt: string | null;
+  endAt: string | null;
+  displayOrder: number | null;
+}
+
+export interface FillinPromptRequestDto {
+  code: string;
+  title: string;
+  message?: string | null;
+  ctaLabel?: string | null;
+  ctaAction?: string | null;
+  audience: PromptAudience;
+  isActive?: boolean;
+  dismissible?: boolean;
+  startAt?: string | null;
+  endAt?: string | null;
+  displayOrder?: number | null;
+}
+
+// District -> Campus mapping DTOs
+export interface DistrictCampusMapDto {
+  districtCode: string;
+  districtName: string;
+  cityName: string | null;
+  provinceName: string | null;
+  campusId: number | null;
+  campusName: string | null;
+}
+
+export interface DistrictCampusMapRequestDto {
+  districtCode: string;
+  campusId: number;
 }

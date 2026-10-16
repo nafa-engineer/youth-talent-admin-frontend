@@ -10,6 +10,8 @@ export const ROUTES = {
   CAMPUSES: '/master/campuses',
   ADMINS: '/master/admins',
   COACHES: '/master/coaches',
+  PROMPTS: '/master/prompts',
+  DISTRICT_MAP: '/master/district-map',
   PROFILE: '/profile',
   COACH_LOGIN: '/coach/login',
   COACH_FORGOT_PASSWORD: '/coach/forgot-password',
@@ -50,6 +52,17 @@ export const API_ROUTES = {
   CUSTOMERS: '/api/v1/customers',
   CUSTOMERS_COUNT: '/api/v1/customers/count',
   CUSTOMERS_TRANSFER_TEAM: '/api/v1/customers/transfer-team',
+  CUSTOMERS_DISTRIBUTION: '/api/v1/customers/distribution',
+
+  REGIONS_PROVINCES: '/api/v1/regions/provinces',
+  REGIONS_CITIES: '/api/v1/regions/cities',
+  REGIONS_DISTRICTS: '/api/v1/regions/districts',
+  REGIONS_VILLAGES: '/api/v1/regions/villages',
+
+  PROMPTS: '/api/v1/prompts',
+  PROMPTS_ALL: '/api/v1/prompts/all',
+  PROMPT_DETAIL: (id: number | string) => `/api/v1/prompts/${id}`,
+  DISTRICT_CAMPUS_MAP: '/api/v1/district-campus-map',
   
   TEAMS: '/api/v1/teams',
   TEAM_DETAIL: (id: number | string) => `/api/v1/teams/${id}`,
