@@ -3,13 +3,13 @@
 import React, { useEffect, useState, useCallback } from "react"
 import { useCoachRoleGuard } from "../../../../hooks/use-role-guard"
 import { coachDataApi } from "../../../../lib/api/coach-data"
-import { CoachMentoringRecapDto } from "../../../../types/api"
+import { MentoringAttendanceRecapDto } from "../../../../types/api"
 import { DataTable, ColumnDef } from "../../../../components/shared/data-table"
 import { toast } from "sonner"
 
 export default function CoachMentoringPage() {
   const { isAuthorized } = useCoachRoleGuard()
-  const [data, setData] = useState<CoachMentoringRecapDto[]>([])
+  const [data, setData] = useState<MentoringAttendanceRecapDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   const fetchData = useCallback(async () => {
@@ -33,28 +33,37 @@ export default function CoachMentoringPage() {
 
   if (!isAuthorized) return null
 
-  const columns: ColumnDef<CoachMentoringRecapDto>[] = [
-    { header: "Minggu", render: (row) => <span className="text-sm">{row.weekLabel}</span> },
-    { header: "Tim", render: (row) => <span className="font-medium">{row.teamName}</span> },
+  const columns: ColumnDef<MentoringAttendanceRecapDto>[] = [
+    { header: "Nama Peserta", accessorKey: "customerName", className: "font-semibold text-foreground min-w-[150px]" },
+    {
+      header: "Tim",
+      render: (row) => <span className="font-medium">{row.teamName ?? "-"}</span>,
+    },
     {
       header: "Kehadiran",
       render: (row) => (
         <span className="text-sm">
-          {row.totalAttendance} / {row.totalCustomers} peserta
+          {row.totalAttendance} / {row.totalSessions} sesi
         </span>
       ),
     },
     {
       header: "Persentase",
-      render: (row) => (
-        <span className={`text-sm font-semibold ${
-          (row.attendancePercentage ?? 0) >= 80 ? "text-green-600" :
-          (row.attendancePercentage ?? 0) >= 50 ? "text-yellow-600" :
-          "text-red-600"
-        }`}>
-          {row.attendancePercentage?.toFixed(0) ?? 0}%
-        </span>
-      ),
+      render: (row) => {
+        const percentage = row.totalSessions > 0
+          ? Math.round((row.totalAttendance / row.totalSessions) * 100)
+          : 0
+
+        return (
+          <span className={`text-sm font-semibold ${
+            percentage >= 80 ? "text-green-600" :
+            percentage >= 50 ? "text-yellow-600" :
+            "text-red-600"
+          }`}>
+            {percentage}%
+          </span>
+        )
+      },
     },
   ]
 
@@ -62,7 +71,7 @@ export default function CoachMentoringPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Rekap Mentoring</h1>
-        <p className="text-muted-foreground mt-1">Rekap kehadiran sesi mentoring tim yang Anda bina.</p>
+        <p className="text-muted-foreground mt-1">Rekap kehadiran per peserta pada tim yang Anda bina.</p>
       </div>
 
       <DataTable
