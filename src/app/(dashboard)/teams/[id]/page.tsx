@@ -67,9 +67,24 @@ export default function TeamDetailPage({ params }: PageProps) {
   const fetchMembers = useCallback(async () => {
     setIsLoadingMembers(true)
     try {
-      const response = await customersApi.getCustomers({ teamId })
-      // Since it returns PageCustomerDto: { content: [...] }
-      setMembers(response.content || [])
+      // Ambil seluruh anggota tim dengan membaca semua halaman,
+      // bukan hanya halaman pertama (default 10 data).
+      const pageSize = 100
+      const allMembers: CustomerDto[] = []
+      let page = 0
+
+      while (true) {
+        const response = await customersApi.getCustomers({ teamId, page, size: pageSize })
+        const content = response.content || []
+        allMembers.push(...content)
+
+        if (content.length < pageSize || allMembers.length >= (response.totalElements ?? 0)) {
+          break
+        }
+        page += 1
+      }
+
+      setMembers(allMembers)
     } catch (error) {
       console.error("Failed to fetch team members", error)
       toast.error("Gagal memuat daftar anggota tim")

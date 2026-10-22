@@ -243,6 +243,17 @@ export interface DeedScoreAverageDto {
   activities: ActivityAverageDto[];
 }
 
+export interface CoachDeedScoreAverageDto {
+  teamId: number;
+  teamName: string;
+  campusId: number | null;
+  campusName: string | null;
+  grade: number | null;
+  gender: Gender | null;
+  totalCustomers: number;
+  activities: ActivityAverageDto[];
+}
+
 // Coach DTOs
 export interface TeamSummaryDto {
   id: number;

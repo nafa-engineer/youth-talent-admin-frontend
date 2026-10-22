@@ -3,19 +3,19 @@
 import React, { useEffect, useState, useCallback } from "react"
 import { useCoachRoleGuard } from "../../../../hooks/use-role-guard"
 import { coachDataApi } from "../../../../lib/api/coach-data"
-import { DeedScoreAverageDto } from "../../../../types/api"
+import { CoachDeedScoreAverageDto } from "../../../../types/api"
 import { Card, CardContent } from "../../../../components/ui/card"
 import { Badge } from "../../../../components/ui/badge"
 import { toast } from "sonner"
 
-const calculateTotalScore = (dto: DeedScoreAverageDto): number => {
+const calculateTotalScore = (dto: CoachDeedScoreAverageDto): number => {
   if (!dto || !dto.activities) return 0
   return dto.activities.reduce((sum, act) => sum + act.averageValue, 0)
 }
 
 export default function CoachDeedScorePage() {
   const { isAuthorized } = useCoachRoleGuard()
-  const [data, setData] = useState<DeedScoreAverageDto[]>([])
+  const [data, setData] = useState<CoachDeedScoreAverageDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   const fetchData = useCallback(async () => {
@@ -73,7 +73,7 @@ export default function CoachDeedScorePage() {
                 <CardContent className="p-5">
                   <div className="flex items-center justify-between">
                     <div className="text-sm font-semibold text-foreground">
-                      {dto.campusName || "Tim"}
+                      {dto.teamName}
                       {dto.grade ? ` · Grade ${dto.grade}` : ""}
                     </div>
                     <Badge variant="secondary" className="text-xs">

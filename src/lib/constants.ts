@@ -84,6 +84,7 @@ export const API_ROUTES = {
   COACH_TEAMS: '/api/v1/coach/teams',
   COACH_CUSTOMERS: '/api/v1/coach/customers',
   COACH_MENTORING_RECAP: '/api/v1/coach/mentoring/recap',
+  COACH_MENTORING_RECAP_MEMBERS: '/api/v1/coach/mentoring/recap/members',
   COACH_DEED_SCORE_AVERAGE: '/api/v1/coach/deed-score/average',
 };
 
