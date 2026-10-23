@@ -144,6 +144,10 @@ export interface RegionDistribution {
   count: number;
   latitude?: number | null;
   longitude?: number | null;
+  districtName?: string | null;
+  cityName?: string | null;
+  provinceName?: string | null;
+  villages?: RegionDistribution[] | null;
 }
 
 // Team DTOs
