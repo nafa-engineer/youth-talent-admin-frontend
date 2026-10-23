@@ -254,6 +254,26 @@ export interface CoachDeedScoreAverageDto {
   activities: ActivityAverageDto[];
 }
 
+export interface CoachDeedScoreMemberEntryDto {
+  deedActivityId: number;
+  activityName: string;
+  unit: string | null;
+  value: number;
+  score: number;
+}
+
+export interface CoachDeedScoreMemberDto {
+  customerId: number;
+  customerName: string;
+  teamId: number | null;
+  teamName: string | null;
+  campusId: number | null;
+  campusName: string | null;
+  grade: number | null;
+  totalScore: number;
+  activities: CoachDeedScoreMemberEntryDto[];
+}
+
 // Coach DTOs
 export interface TeamSummaryDto {
   id: number;

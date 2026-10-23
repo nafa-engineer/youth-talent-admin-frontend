@@ -86,6 +86,7 @@ export const API_ROUTES = {
   COACH_MENTORING_RECAP: '/api/v1/coach/mentoring/recap',
   COACH_MENTORING_RECAP_MEMBERS: '/api/v1/coach/mentoring/recap/members',
   COACH_DEED_SCORE_AVERAGE: '/api/v1/coach/deed-score/average',
+  COACH_DEED_SCORE_MEMBERS: '/api/v1/coach/deed-score/members',
 };
 
 export const GENDER_OPTIONS = [
