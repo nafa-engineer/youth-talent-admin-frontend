@@ -4,6 +4,7 @@ import {
   TeamSummaryDto,
   CustomerDto,
   CoachDeedScoreAverageDto,
+  CoachDeedScoreMemberDto,
   MentoringAttendanceRecapDto,
 } from '../../types/api';
 import { API_ROUTES } from '../constants';
@@ -43,6 +44,18 @@ export const coachDataApi = {
   }): Promise<CoachDeedScoreAverageDto[]> => {
     const response = await apiClient.get<CoachDeedScoreAverageDto[]>(
       API_ROUTES.COACH_DEED_SCORE_AVERAGE,
+      { params }
+    );
+    return response.data;
+  },
+
+  getDeedScoreMembers: async (params?: {
+    weekIds?: number[];
+    startDate?: string;
+    endDate?: string;
+  }): Promise<CoachDeedScoreMemberDto[]> => {
+    const response = await apiClient.get<CoachDeedScoreMemberDto[]>(
+      API_ROUTES.COACH_DEED_SCORE_MEMBERS,
       { params }
     );
     return response.data;
