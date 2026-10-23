@@ -3,28 +3,26 @@
 import React, { useEffect, useState, useCallback } from "react"
 import { useCoachRoleGuard } from "../../../../hooks/use-role-guard"
 import { coachDataApi } from "../../../../lib/api/coach-data"
-import { DeedScoreAverageDto } from "../../../../types/api"
+import { CoachDeedScoreMemberDto } from "../../../../types/api"
 import { Card, CardContent } from "../../../../components/ui/card"
 import { Badge } from "../../../../components/ui/badge"
 import { toast } from "sonner"
 
-const calculateTotalScore = (dto: DeedScoreAverageDto): number => {
-  if (!dto || !dto.activities) return 0
-  return dto.activities.reduce((sum, act) => sum + act.averageValue, 0)
-}
+const formatValue = (value: number): string =>
+  Number(value).toLocaleString("id-ID", { maximumFractionDigits: 2 })
 
 export default function CoachDeedScorePage() {
   const { isAuthorized } = useCoachRoleGuard()
-  const [data, setData] = useState<DeedScoreAverageDto[]>([])
+  const [data, setData] = useState<CoachDeedScoreMemberDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   const fetchData = useCallback(async () => {
     setIsLoading(true)
     try {
-      const result = await coachDataApi.getDeedScoreAverage()
+      const result = await coachDataApi.getDeedScoreMembers()
       setData(result)
     } catch (error) {
-      console.error("Failed to fetch deed score average", error)
+      console.error("Failed to fetch deed score members", error)
       toast.error("Gagal memuat rekap amalan")
     } finally {
       setIsLoading(false)
@@ -43,7 +41,7 @@ export default function CoachDeedScorePage() {
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Rekap Amalan Tim</h1>
         <p className="text-muted-foreground mt-1">
-          Rata-rata skor amalan yaumiyah tim yang Anda bina.
+          Rekap amalan yaumiyah per peserta pada tim yang Anda bina.
         </p>
       </div>
 
@@ -61,50 +59,62 @@ export default function CoachDeedScorePage() {
       ) : data.length === 0 ? (
         <Card className="border-border/60">
           <CardContent className="p-6 text-sm text-muted-foreground">
-            Belum ada data amalan untuk tim Anda.
+            Belum ada peserta pada tim Anda.
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {data.map((dto, idx) => {
-            const total = calculateTotalScore(dto)
-            return (
-              <Card key={idx} className="border-border/60 shadow-md">
-                <CardContent className="p-5">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm font-semibold text-foreground">
-                      {dto.campusName || "Tim"}
-                      {dto.grade ? ` · Grade ${dto.grade}` : ""}
+          {data.map((member) => (
+            <Card key={member.customerId} className="border-border/60 shadow-md">
+              <CardContent className="p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-semibold text-foreground">
+                      {member.customerName}
                     </div>
-                    <Badge variant="secondary" className="text-xs">
-                      {dto.totalCustomers} peserta
-                    </Badge>
+                    <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                      {member.teamName || "Tanpa tim"}
+                      {member.grade ? ` · Grade ${member.grade}` : ""}
+                    </div>
                   </div>
+                  <Badge
+                    variant={member.activities.length > 0 ? "secondary" : "outline"}
+                    className="shrink-0 text-xs"
+                  >
+                    {member.activities.length > 0 ? "Sudah mengisi" : "Belum mengisi"}
+                  </Badge>
+                </div>
 
-                  <div className="mt-3 text-3xl font-extrabold text-primary">
-                    {total.toFixed(1)}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Rata-rata Skor</div>
+                <div className="mt-3 text-3xl font-extrabold text-primary">
+                  {(Number(member.totalScore ?? 0) * 100).toFixed(1)}
+                </div>
+                <div className="text-xs text-muted-foreground">Total Poin (skala 0–100)</div>
 
-                  {dto.activities && dto.activities.length > 0 && (
-                    <div className="mt-4 space-y-1 border-t border-border pt-3">
-                      {dto.activities.map((act) => (
-                        <div
-                          key={act.deedActivityId}
-                          className="flex items-center justify-between text-xs"
-                        >
-                          <span className="text-muted-foreground">{act.activityName}</span>
-                          <span className="font-medium text-foreground">
-                            {act.averageValue.toFixed(1)} {act.unit}
+                {member.activities.length > 0 ? (
+                  <div className="mt-4 space-y-1 border-t border-border pt-3">
+                    {member.activities.map((act) => (
+                      <div
+                        key={act.deedActivityId}
+                        className="flex items-center justify-between gap-3 text-xs"
+                      >
+                        <span className="text-muted-foreground">{act.activityName}</span>
+                        <span className="shrink-0 text-right font-medium text-foreground">
+                          {formatValue(act.value)} {act.unit ?? ""}
+                          <span className="ml-1 text-muted-foreground">
+                            ({(Number(act.score ?? 0) * 100).toFixed(0)} poin)
                           </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )
-          })}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
+                    Belum ada amalan pada periode ini.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
     </div>

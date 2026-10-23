@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { useAuth } from '../../../hooks/use-auth';
 import { CampusFilter } from '../../../components/shared/campus-filter';
 import { GenderPieChart } from '../../../components/dashboard/gender-pie-chart';
@@ -11,6 +12,12 @@ import { TeamCampusBarChart } from '../../../components/dashboard/team-campus-ba
 import { TeamEntryYearChart } from '../../../components/dashboard/team-entry-year-chart';
 import { MentoringSummarySection } from '../../../components/dashboard/mentoring-summary-section';
 import { DeedScoreSection } from '../../../components/dashboard/deed-score-section';
+import { RegionDistributionChart } from '../../../components/dashboard/region-distribution-chart';
+
+const RegionMap = dynamic(
+  () => import('../../../components/dashboard/region-map').then((m) => m.RegionMap),
+  { ssr: false, loading: () => <div className="h-[380px] w-full rounded-xl bg-muted/20 animate-pulse" /> }
+);
 import { customersApi } from '../../../lib/api/customers';
 import { weeksApi } from '../../../lib/api/weeks';
 import { WeekDto } from '../../../types/api';
@@ -303,6 +310,21 @@ export default function DashboardPage() {
           isSuperAdmin={isSuperAdmin}
           weekParams={weekParams}
         />
+      </section>
+
+      {/* ═══ SECTION 5: Sebaran Domisili ═══ */}
+      <section className="space-y-6 pt-4 border-t border-border/40">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">5. Sebaran Domisili Peserta</h2>
+          <p className="text-xs text-muted-foreground">
+            Distribusi domisili peserta berdasarkan wilayah (kecamatan & provinsi)
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+          <RegionDistributionChart campusId={effectiveCampusId} />
+          <RegionMap campusId={effectiveCampusId} />
+        </div>
       </section>
     </div>
   );

@@ -10,6 +10,8 @@ export const ROUTES = {
   CAMPUSES: '/master/campuses',
   ADMINS: '/master/admins',
   COACHES: '/master/coaches',
+  PROMPTS: '/master/prompts',
+  DISTRICT_MAP: '/master/district-map',
   PROFILE: '/profile',
   COACH_LOGIN: '/coach/login',
   COACH_FORGOT_PASSWORD: '/coach/forgot-password',
@@ -17,6 +19,7 @@ export const ROUTES = {
   COACH_DASHBOARD: '/coach',
   COACH_DEED_SCORE: '/coach/deed-score',
   COACH_MENTORING: '/coach/mentoring',
+  COACH_DOMICILE_MAP: '/coach/domicile-map',
   COACH_PROFILE: '/coach/profile',
 };
 
@@ -50,6 +53,17 @@ export const API_ROUTES = {
   CUSTOMERS: '/api/v1/customers',
   CUSTOMERS_COUNT: '/api/v1/customers/count',
   CUSTOMERS_TRANSFER_TEAM: '/api/v1/customers/transfer-team',
+  CUSTOMERS_DISTRIBUTION: '/api/v1/customers/distribution',
+
+  REGIONS_PROVINCES: '/api/v1/regions/provinces',
+  REGIONS_CITIES: '/api/v1/regions/cities',
+  REGIONS_DISTRICTS: '/api/v1/regions/districts',
+  REGIONS_VILLAGES: '/api/v1/regions/villages',
+
+  PROMPTS: '/api/v1/prompts',
+  PROMPTS_ALL: '/api/v1/prompts/all',
+  PROMPT_DETAIL: (id: number | string) => `/api/v1/prompts/${id}`,
+  DISTRICT_CAMPUS_MAP: '/api/v1/district-campus-map',
   
   TEAMS: '/api/v1/teams',
   TEAM_DETAIL: (id: number | string) => `/api/v1/teams/${id}`,
@@ -71,7 +85,10 @@ export const API_ROUTES = {
   COACH_TEAMS: '/api/v1/coach/teams',
   COACH_CUSTOMERS: '/api/v1/coach/customers',
   COACH_MENTORING_RECAP: '/api/v1/coach/mentoring/recap',
+  COACH_MENTORING_RECAP_MEMBERS: '/api/v1/coach/mentoring/recap/members',
   COACH_DEED_SCORE_AVERAGE: '/api/v1/coach/deed-score/average',
+  COACH_DEED_SCORE_MEMBERS: '/api/v1/coach/deed-score/members',
+  COACH_REGION_DISTRIBUTION: '/api/v1/coach/region-distribution',
 };
 
 export const GENDER_OPTIONS = [

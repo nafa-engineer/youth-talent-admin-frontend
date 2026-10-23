@@ -1,12 +1,23 @@
 "use client";
 
 import React, { useState } from 'react';
-import { CustomerDto } from '../../types/api';
+import { CustomerDto, RegionDetail } from '../../types/api';
 import { DataTable, ColumnDef } from '../shared/data-table';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { ArrowLeftRight, User, UserCheck } from 'lucide-react';
 import { TransferModal } from '../teams/transfer-modal';
+
+function formatRegion(region?: RegionDetail | null): string {
+  if (!region) return '';
+  const parts = [
+    region.village,
+    region.district ? `Kec. ${region.district}` : null,
+    region.city,
+    region.province,
+  ].filter(Boolean);
+  return parts.join(', ') + (region.postalCode ? ` (${region.postalCode})` : '');
+}
 
 interface CustomerTableProps {
   customers: CustomerDto[];
@@ -75,8 +86,8 @@ export function CustomerTable({ customers, isLoading, onRefresh }: CustomerTable
       header: 'Domisili / Asal',
       render: (row) => (
         <div className="text-xs space-y-0.5">
-          <div><span className="text-muted-foreground">Domisili:</span> {row.domicile || '-'}</div>
-          <div><span className="text-muted-foreground">Asal:</span> {row.origin || '-'}</div>
+          <div><span className="text-muted-foreground">Domisili:</span> {formatRegion(row.domicileRegion) || row.domicile || '-'}</div>
+          <div><span className="text-muted-foreground">Asal:</span> {formatRegion(row.originRegion) || row.origin || '-'}</div>
         </div>
       ),
     },

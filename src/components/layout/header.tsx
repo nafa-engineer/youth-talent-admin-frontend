@@ -19,6 +19,7 @@ export function Header({ onMenuClick }: HeaderProps) {
     if (isCoach) {
       if (pathname.startsWith(ROUTES.COACH_DEED_SCORE)) return 'Rekap Amalan Tim';
       if (pathname.startsWith(ROUTES.COACH_MENTORING)) return 'Rekap Mentoring';
+      if (pathname.startsWith(ROUTES.COACH_DOMICILE_MAP)) return 'Peta Domisili';
       if (pathname.startsWith(ROUTES.COACH_PROFILE)) return 'Profil Saya';
       return 'Dashboard Coach';
     }

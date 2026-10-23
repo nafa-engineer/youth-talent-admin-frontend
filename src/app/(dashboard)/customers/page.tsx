@@ -7,6 +7,7 @@ import { customersApi } from '../../../lib/api/customers';
 import { CustomerDto, Gender, EducationLevel, CustomerFilterParams } from '../../../types/api';
 import { CustomerStats } from '../../../components/customers/customer-stats';
 import { CustomerFilters } from '../../../components/customers/customer-filters';
+import { RegionValue } from '../../../components/shared/region-cascade';
 import { CustomerTable } from '../../../components/customers/customer-table';
 import { Pagination } from '../../../components/shared/pagination';
 import { toast } from 'sonner';
@@ -26,6 +27,7 @@ export default function CustomersPage() {
   const [hasTeamFilter, setHasTeamFilter] = useState<boolean | null>(null);
   const [genderFilter, setGenderFilter] = useState<Gender | null>(null);
   const [educationLevelFilter, setEducationLevelFilter] = useState<EducationLevel | null>(null);
+  const [region, setRegion] = useState<RegionValue>({ provinceCode: '', cityCode: '', districtCode: '' });
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [searchBy, setSearchBy] = useState<SearchBy>('ALL');
@@ -64,6 +66,9 @@ export default function CustomersPage() {
       if (hasTeamFilter !== null) params.hasTeam = hasTeamFilter;
       if (genderFilter !== null) params.gender = genderFilter;
       if (educationLevelFilter !== null) params.educationLevel = educationLevelFilter;
+      if (region.provinceCode) params.provinceCode = region.provinceCode;
+      if (region.cityCode) params.cityCode = region.cityCode;
+      if (region.districtCode) params.districtCode = region.districtCode;
       if (debouncedSearch.trim()) {
         params.search = debouncedSearch.trim();
         params.searchBy = searchBy;
@@ -79,7 +84,7 @@ export default function CustomersPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [activeCampusId, hasTeamFilter, genderFilter, educationLevelFilter, debouncedSearch, searchBy, page, size]);
+  }, [activeCampusId, hasTeamFilter, genderFilter, educationLevelFilter, region, debouncedSearch, searchBy, page, size]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -92,6 +97,7 @@ export default function CustomersPage() {
     setHasTeamFilter(null);
     setGenderFilter(null);
     setEducationLevelFilter(null);
+    setRegion({ provinceCode: '', cityCode: '', districtCode: '' });
     if (isSuperAdmin) {
       setSelectedCampus(null);
     }
@@ -106,6 +112,9 @@ export default function CustomersPage() {
       if (hasTeamFilter !== null) params.hasTeam = hasTeamFilter;
       if (genderFilter !== null) params.gender = genderFilter;
       if (educationLevelFilter !== null) params.educationLevel = educationLevelFilter;
+      if (region.provinceCode) params.provinceCode = region.provinceCode;
+      if (region.cityCode) params.cityCode = region.cityCode;
+      if (region.districtCode) params.districtCode = region.districtCode;
       if (debouncedSearch.trim()) {
         params.search = debouncedSearch.trim();
         params.searchBy = searchBy;
@@ -164,6 +173,8 @@ export default function CustomersPage() {
         onGenderChange={setGenderFilter}
         educationLevelFilter={educationLevelFilter}
         onEducationLevelChange={setEducationLevelFilter}
+        region={region}
+        onRegionChange={setRegion}
         onResetFilters={handleResetFilters}
       />
 

@@ -3,13 +3,24 @@ import {
   CustomerDto, 
   PageCustomerDto, 
   CustomerTransferTeamRequestDto,
-  CustomerFilterParams
+  CustomerFilterParams,
+  RegionDistribution
 } from '../../types/api';
 import { API_ROUTES } from '../constants';
 
 export const customersApi = {
   getCustomers: async (params?: CustomerFilterParams): Promise<PageCustomerDto> => {
     const response = await apiClient.get<PageCustomerDto>(API_ROUTES.CUSTOMERS, { params });
+    return response.data;
+  },
+
+  getDistribution: async (
+    level: 'province' | 'city' | 'district',
+    params?: { campusId?: number }
+  ): Promise<RegionDistribution[]> => {
+    const response = await apiClient.get<RegionDistribution[]>(API_ROUTES.CUSTOMERS_DISTRIBUTION, {
+      params: { level, ...params },
+    });
     return response.data;
   },
   
