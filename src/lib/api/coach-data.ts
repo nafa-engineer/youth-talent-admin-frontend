@@ -6,6 +6,7 @@ import {
   CoachDeedScoreAverageDto,
   CoachDeedScoreMemberDto,
   MentoringAttendanceRecapDto,
+  RegionDistribution,
 } from '../../types/api';
 import { API_ROUTES } from '../constants';
 
@@ -57,6 +58,14 @@ export const coachDataApi = {
     const response = await apiClient.get<CoachDeedScoreMemberDto[]>(
       API_ROUTES.COACH_DEED_SCORE_MEMBERS,
       { params }
+    );
+    return response.data;
+  },
+
+  getRegionDistribution: async (teamId?: number): Promise<RegionDistribution[]> => {
+    const response = await apiClient.get<RegionDistribution[]>(
+      API_ROUTES.COACH_REGION_DISTRIBUTION,
+      { params: teamId ? { teamId } : undefined }
     );
     return response.data;
   },

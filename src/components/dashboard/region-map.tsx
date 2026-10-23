@@ -10,37 +10,57 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
 
 interface RegionMapProps {
-  campusId: number | null;
+  campusId?: number | null;
+  points?: RegionDistribution[];
+  isLoading?: boolean;
+  title?: string;
+  emptyMessage?: string;
 }
 
 const INDONESIA_CENTER: [number, number] = [-2.5, 118];
 const INDONESIA_ZOOM = 5;
 
-export function RegionMap({ campusId }: RegionMapProps) {
-  const [points, setPoints] = useState<RegionDistribution[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export function RegionMap({
+  campusId = null,
+  points: providedPoints,
+  isLoading: providedLoading,
+  title = "Peta Sebaran Domisili (per Kecamatan)",
+  emptyMessage = "Belum ada data domisili peserta",
+}: RegionMapProps) {
+  const isControlled = providedPoints !== undefined;
+  const [fetchedPoints, setFetchedPoints] = useState<RegionDistribution[]>([]);
+  const [isFetching, setIsFetching] = useState(!isControlled);
+
+  const points = providedPoints ?? fetchedPoints;
+  const isLoading = providedLoading ?? isFetching;
 
   useEffect(() => {
+    if (isControlled) return;
+
     const fetchData = async () => {
-      setIsLoading(true);
+      setIsFetching(true);
       try {
         const params = campusId ? { campusId } : undefined;
         const result = await customersApi.getDistribution("district", params);
-        setPoints(result.filter((r) => r.latitude != null && r.longitude != null));
+        setFetchedPoints(result.filter((r) => r.latitude != null && r.longitude != null));
       } catch (error) {
         console.error("Failed to fetch region map data", error);
       } finally {
-        setIsLoading(false);
+        setIsFetching(false);
       }
     };
     fetchData();
-  }, [campusId]);
+  }, [campusId, isControlled]);
 
   const buildIcon = (count: number) => {
-    const size = count >= 100 ? 40 : count >= 10 ? 34 : 28;
+    // Ukuran lingkaran selalu sama agar titik dengan jumlah besar tidak
+    // menutupi titik wilayah lain. Hanya ukuran font yang menyesuaikan.
+    const size = 34;
+    const digits = String(count).length;
+    const fontSize = digits >= 5 ? 8 : digits === 4 ? 9 : 11;
     return L.divIcon({
       className: "",
-      html: `<div style="background:#2D7A4F;color:#FFFFFF;border-radius:9999px;width:${size}px;height:${size}px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;line-height:1;border:2px solid #FFFFFF;box-shadow:0 1px 4px rgba(0,0,0,.4)">${count}</div>`,
+      html: `<div style="background:#2D7A4F;color:#FFFFFF;border-radius:9999px;width:${size}px;height:${size}px;display:flex;align-items:center;justify-content:center;font-size:${fontSize}px;font-weight:700;line-height:1;border:2px solid #FFFFFF;box-shadow:0 1px 4px rgba(0,0,0,.4)">${count}</div>`,
       iconSize: [size, size],
       iconAnchor: [size / 2, size / 2],
     });
@@ -50,7 +70,7 @@ export function RegionMap({ campusId }: RegionMapProps) {
     <Card className="border-primary/10 shadow-sm h-full">
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-foreground">
-          Peta Sebaran Domisili (per Kecamatan)
+          {title}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -58,7 +78,7 @@ export function RegionMap({ campusId }: RegionMapProps) {
           <Skeleton className="h-[380px] w-full rounded-xl" />
         ) : points.length === 0 ? (
           <div className="flex justify-center items-center h-[380px] text-muted-foreground text-sm">
-            Belum ada data domisili peserta
+            {emptyMessage}
           </div>
         ) : (
           <div className="h-[380px] w-full rounded-xl overflow-hidden border">
@@ -79,10 +99,36 @@ export function RegionMap({ campusId }: RegionMapProps) {
                   icon={buildIcon(p.count)}
                 >
                   <Popup>
-                    <div className="text-xs">
-                      <strong>{p.name}</strong>
-                      <br />
-                      {p.count} peserta
+                    <div className="min-w-[190px] space-y-1 text-xs">
+                      <div className="font-semibold text-foreground">
+                        Kecamatan {p.districtName || p.name}
+                      </div>
+                      <div className="text-muted-foreground">
+                        {[p.cityName, p.provinceName].filter(Boolean).join(", ")}
+                      </div>
+                      <div className="font-medium text-foreground">
+                        {p.count} peserta
+                      </div>
+                      {p.villages && p.villages.length > 0 && (
+                        <div className="border-t border-border pt-1">
+                          <div className="mb-1 font-medium text-foreground">
+                            Kelurahan/Desa:
+                          </div>
+                          <ul className="max-h-32 space-y-0.5 overflow-y-auto">
+                            {p.villages.map((village) => (
+                              <li
+                                key={village.code}
+                                className="flex items-center justify-between gap-3"
+                              >
+                                <span className="text-muted-foreground">{village.name}</span>
+                                <span className="shrink-0 font-medium text-foreground">
+                                  {village.count}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   </Popup>
                 </Marker>
@@ -91,7 +137,10 @@ export function RegionMap({ campusId }: RegionMapProps) {
           </div>
         )}
         <p className="mt-2 text-[10px] text-muted-foreground">
-          Angka pada titik = jumlah peserta di kecamatan tersebut. Warna makin pekat = makin banyak. Titik berdasarkan centroid kecamatan (sebagian perkiraan).
+          Angka pada titik = jumlah peserta di kecamatan tersebut. Ukuran lingkaran
+          seragam agar tidak menutupi wilayah lain. Klik angka untuk melihat
+          kecamatan, kabupaten/kota, provinsi, dan rincian kelurahan/desa. Titik
+          berdasarkan centroid kecamatan (sebagian perkiraan).
         </p>
       </CardContent>
     </Card>
