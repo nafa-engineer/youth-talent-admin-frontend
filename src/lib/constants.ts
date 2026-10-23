@@ -19,6 +19,7 @@ export const ROUTES = {
   COACH_DASHBOARD: '/coach',
   COACH_DEED_SCORE: '/coach/deed-score',
   COACH_MENTORING: '/coach/mentoring',
+  COACH_DOMICILE_MAP: '/coach/domicile-map',
   COACH_PROFILE: '/coach/profile',
 };
 
@@ -87,6 +88,7 @@ export const API_ROUTES = {
   COACH_MENTORING_RECAP_MEMBERS: '/api/v1/coach/mentoring/recap/members',
   COACH_DEED_SCORE_AVERAGE: '/api/v1/coach/deed-score/average',
   COACH_DEED_SCORE_MEMBERS: '/api/v1/coach/deed-score/members',
+  COACH_REGION_DISTRIBUTION: '/api/v1/coach/region-distribution',
 };
 
 export const GENDER_OPTIONS = [

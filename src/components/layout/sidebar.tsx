@@ -58,6 +58,7 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
   const coachNavItems = [
     { name: 'Rekap Amalan Tim', href: ROUTES.COACH_DEED_SCORE, icon: BookOpen },
     { name: 'Rekap Mentoring', href: ROUTES.COACH_MENTORING, icon: UserCheck },
+    { name: 'Peta Domisili', href: ROUTES.COACH_DOMICILE_MAP, icon: MapPin },
     { name: 'Profil', href: ROUTES.COACH_PROFILE, icon: User },
   ];
 

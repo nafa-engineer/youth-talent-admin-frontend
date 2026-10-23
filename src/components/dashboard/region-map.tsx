@@ -10,31 +10,47 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
 
 interface RegionMapProps {
-  campusId: number | null;
+  campusId?: number | null;
+  points?: RegionDistribution[];
+  isLoading?: boolean;
+  title?: string;
+  emptyMessage?: string;
 }
 
 const INDONESIA_CENTER: [number, number] = [-2.5, 118];
 const INDONESIA_ZOOM = 5;
 
-export function RegionMap({ campusId }: RegionMapProps) {
-  const [points, setPoints] = useState<RegionDistribution[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export function RegionMap({
+  campusId = null,
+  points: providedPoints,
+  isLoading: providedLoading,
+  title = "Peta Sebaran Domisili (per Kecamatan)",
+  emptyMessage = "Belum ada data domisili peserta",
+}: RegionMapProps) {
+  const isControlled = providedPoints !== undefined;
+  const [fetchedPoints, setFetchedPoints] = useState<RegionDistribution[]>([]);
+  const [isFetching, setIsFetching] = useState(!isControlled);
+
+  const points = providedPoints ?? fetchedPoints;
+  const isLoading = providedLoading ?? isFetching;
 
   useEffect(() => {
+    if (isControlled) return;
+
     const fetchData = async () => {
-      setIsLoading(true);
+      setIsFetching(true);
       try {
         const params = campusId ? { campusId } : undefined;
         const result = await customersApi.getDistribution("district", params);
-        setPoints(result.filter((r) => r.latitude != null && r.longitude != null));
+        setFetchedPoints(result.filter((r) => r.latitude != null && r.longitude != null));
       } catch (error) {
         console.error("Failed to fetch region map data", error);
       } finally {
-        setIsLoading(false);
+        setIsFetching(false);
       }
     };
     fetchData();
-  }, [campusId]);
+  }, [campusId, isControlled]);
 
   const buildIcon = (count: number) => {
     // Ukuran lingkaran selalu sama agar titik dengan jumlah besar tidak
@@ -54,7 +70,7 @@ export function RegionMap({ campusId }: RegionMapProps) {
     <Card className="border-primary/10 shadow-sm h-full">
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-foreground">
-          Peta Sebaran Domisili (per Kecamatan)
+          {title}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -62,7 +78,7 @@ export function RegionMap({ campusId }: RegionMapProps) {
           <Skeleton className="h-[380px] w-full rounded-xl" />
         ) : points.length === 0 ? (
           <div className="flex justify-center items-center h-[380px] text-muted-foreground text-sm">
-            Belum ada data domisili peserta
+            {emptyMessage}
           </div>
         ) : (
           <div className="h-[380px] w-full rounded-xl overflow-hidden border">
